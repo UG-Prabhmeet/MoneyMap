@@ -1,4 +1,4 @@
-'use client';
+"use client"; // needed for SignIn Component from Clerk
 import { SignIn } from '@clerk/nextjs'
 import React from 'react'
 

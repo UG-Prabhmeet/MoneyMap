@@ -1,5 +1,5 @@
-'use client';
-import { SignUp } from '@clerk/clerk-react'
+"use client"; // needed for SignIn Component from Clerk
+import { SignUp } from '@clerk/nextjs'
 import React from 'react'
 
 const Page = () => {
