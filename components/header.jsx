@@ -8,21 +8,21 @@ import { Button } from './ui/button';
 
 const Header = () => {
   return (
-    <div className="fixed top-0 w-full bg-white/80 backdrop-blur-md z-50 border-b flex justify-evenly">
-      <nav className="container mx-auto px-4 py-4 flex items-center justify-between">
+    <div className="fixed top-0 w-full h-16 bg-white/80 backdrop-blur-md z-50 border-b flex">
+      <nav className="container mx-auto px-4 py-4 flex items-center justify-around">
         <Link href="/">
           <Image
             src="/logo.png"
             alt="Logo"
-            width={200}
+            width={225}
             height={60}
-            className="h-12 w-auto object-contain"
+            className="h-14 w-auto object-contain" 
           />
         </Link>
 
         <div className="flex items-center space-x-4">
           <SignedIn>
-            <a
+            <Link
               href="/dashboard"
               className="text-gray-600 hover:text-blue-600 flex items-center gap-2"
             >
@@ -30,14 +30,14 @@ const Header = () => {
                 <LayoutDashboard size={18} />
                 <span className="hidden md:inline">Dashboard</span>
               </Button>
-            </a>
+            </Link>
 
-            <a href="/transaction/create">
+            <Link href="/transaction/create">
               <Button className="flex items-center gap-2">
                 <PenBox size={18} />
                 <span className="hidden md:inline">Add Transaction</span>
               </Button>
-            </a>
+            </Link>
           </SignedIn>
 
           <SignedOut>
