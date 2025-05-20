@@ -49,7 +49,7 @@ export function AddTransactionForm({ accounts, categories, editMode = false, ini
 						...(initialData.recurringInterval && {
 							recurringInterval: initialData.recurringInterval,
 						}),
-				  }
+					}
 				: {
 						type: 'EXPENSE',
 						amount: '',
@@ -57,7 +57,7 @@ export function AddTransactionForm({ accounts, categories, editMode = false, ini
 						accountId: accounts.find((ac) => ac.isDefault)?.id,
 						date: new Date(),
 						isRecurring: false,
-				  },
+					},
 	});
 
 	const {
