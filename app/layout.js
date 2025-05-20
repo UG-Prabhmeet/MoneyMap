@@ -36,11 +36,11 @@ export default function RootLayout({ children }) {
 							{/* for email support */}
 
 							{/* <div className="mt-6 text-center">
-              <p className="text-xl font-medium">Need help managing your finances?</p>
-              <a href="mailto:support@financetracker.com" className="text-4xl font-bold underline">
-                support@financetracker.com
-              </a>
-            </div> */}
+								<p className="text-xl font-medium">Need help managing your finances?</p>
+								<a href="mailto:support@financetracker.com" className="text-4xl font-bold underline">
+									support@financetracker.com
+								</a>
+								</div> */}
 							<div className='absolute top-4 right-4 text-2xl'>©</div>
 						</div>
 					</footer>

@@ -1,9 +1,5 @@
-'use client'; // needed for SignIn Component from Clerk
 import { SignUp } from '@clerk/nextjs';
-import React from 'react';
 
-const Page = () => {
+export default function Page() {
 	return <SignUp />;
-};
-
-export default Page;
+}
