@@ -6,10 +6,15 @@ import {
     TooltipTrigger,
     TooltipContent,
 } from "@/components/ui/tooltip";
-import { ArrowUpRight, ArrowDownRight, ArrowRight, Info } from "lucide-react";
+import { ArrowUpRight, ArrowDownRight, Info, Activity } from "lucide-react";
 
 export default function FinancialHealthScore({ data, trend }) {
-    if (!data) return <Card className="p-4">Unable to load health score</Card>;
+    if (!data)
+        return (
+            <Card className="p-4 bg-background text-foreground border-border">
+                Unable to load health score
+            </Card>
+        );
 
     const trendIcon =
         trend > 0 ? (
@@ -17,14 +22,15 @@ export default function FinancialHealthScore({ data, trend }) {
         ) : trend < 0 ? (
             <ArrowDownRight className="text-red-500" />
         ) : (
-            <span className="text-muted-foreground">↔</span> // clean and semantically correct
+            <span className="text-muted-foreground">↔</span>
         );
 
     return (
-        <Card className="p-4 space-y-1">
+        <Card className="p-4 space-y-1 bg-background text-foreground border-border">
             <div className="flex items-center gap-2 mb-2">
                 <h2 className="text-lg font-semibold flex items-center gap-2">
-                    📊 Financial Health
+                    <Activity className="h-5 w-5 text-primary" />
+                    Financial Health
                     <Tooltip>
                         <TooltipTrigger>
                             <span className="text-muted-foreground text-sm">
@@ -50,30 +56,30 @@ export default function FinancialHealthScore({ data, trend }) {
                 {trendIcon}
             </div>
 
-            <hr className="my-2" />
+            <hr className="my-2 border-muted" />
 
             <div className="grid grid-cols-2 md:grid-cols-3 text-sm text-muted-foreground gap-y-1">
                 <div>
                     <p>Income</p>
-                    <p className="text-black">₹{data.income}</p>
+                    <p className="text-foreground">₹{data.income}</p>
                 </div>
                 <div>
                     <p>Expenses</p>
-                    <p className="text-black">₹{data.expenses}</p>
+                    <p className="text-foreground">₹{data.expenses}</p>
                 </div>
                 <div>
                     <p>Debt</p>
-                    <p className="text-black">₹{data.debt}</p>
+                    <p className="text-foreground">₹{data.debt}</p>
                 </div>
                 <div>
                     <p>Savings Rate</p>
-                    <p className="text-black">
+                    <p className="text-foreground">
                         {(data.savingsRate * 100).toFixed(1)}%
                     </p>
                 </div>
                 <div>
                     <p>Debt-to-Income</p>
-                    <p className="text-black">
+                    <p className="text-foreground">
                         {(data.debtToIncome * 100).toFixed(1)}%
                     </p>
                 </div>

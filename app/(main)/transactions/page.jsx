@@ -1,13 +1,10 @@
 import { Suspense } from "react";
-import { getAccountWithTransactions } from "@/actions/account";
 import { BarLoader } from "react-spinners";
-import { TransactionTable } from "../_components/transaction-table";
-import { notFound } from "next/navigation";
-import { AccountChart } from "../_components/account-chart";
+import { TransactionTable } from "../account/_components/transaction-table";
+import { getAccountWithTransactions } from "@/actions/account";
 
-export default async function AccountPage({ params }) {
-    const { accountID } = await params;
-    const accountData = await getAccountWithTransactions(accountID);
+export default async function TransactionPage() {
+    const accountData = await getAccountWithTransactions();
 
     if (!accountData) {
         notFound();
@@ -38,19 +35,6 @@ export default async function AccountPage({ params }) {
                     </p>
                 </div>
             </div>
-
-            {/* Chart Section */}
-            <Suspense
-                fallback={
-                    <BarLoader
-                        className="mt-4"
-                        width={"100%"}
-                        color="#9333ea"
-                    />
-                }
-            >
-                <AccountChart transactions={transactions} />
-            </Suspense>
 
             {/* Transactions Table */}
             <Suspense

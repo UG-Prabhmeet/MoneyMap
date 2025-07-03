@@ -1,7 +1,17 @@
-import React from 'react';
+import { AppSidebar } from "@/components/app-sidebar";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import React from "react";
 
 const MainLayout = ({ children }) => {
-	return <div className='container mx-auto my-32'>{children}</div>;
+    return (
+        <SidebarProvider>
+            <AppSidebar />
+            <div className="container mx-auto">
+                <SidebarTrigger />
+                {children}
+            </div>
+        </SidebarProvider>
+    );
 };
 
 export default MainLayout;
