@@ -1,6 +1,4 @@
-import { Suspense } from "react";
-import { getUserAccounts } from "@/actions/dashboard";
-import { getDashboardData } from "@/actions/dashboard";
+import { getUserAccounts, getDashboardData } from "@/actions/dashboard";
 import { getCurrentBudget } from "@/actions/budget";
 import { AccountCard } from "./_components/account-card";
 import { CreateAccountDrawer } from "@/components/create-account-drawer";
@@ -28,9 +26,13 @@ export default async function DashboardPage() {
     }
 
     return (
-        <div className="space-y-10">
+        <div className="space-y-12 px-6 py-8">
             {/* Budget Progress */}
-            <section>
+            <section className="bg-background border rounded-2xl shadow-sm p-6">
+                <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
+                    <Briefcase className="h-5 w-5 text-primary" />
+                    Monthly Budget
+                </h2>
                 <BudgetProgress
                     initialBudget={budgetData?.budget}
                     currentExpenses={budgetData?.currentExpenses || 0}
@@ -38,7 +40,11 @@ export default async function DashboardPage() {
             </section>
 
             {/* Financial Health Score */}
-            <section>
+            <section className="bg-background border rounded-2xl shadow-sm p-6">
+                <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
+                    <Briefcase className="h-5 w-5 text-primary" />
+                    Financial Health
+                </h2>
                 <FinancialHealthScore
                     data={financialHealth}
                     trend={financialHealth.trend}
@@ -46,7 +52,11 @@ export default async function DashboardPage() {
             </section>
 
             {/* Dashboard Overview */}
-            <section>
+            <section className="bg-background border rounded-2xl shadow-sm p-6">
+                <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
+                    <Briefcase className="h-5 w-5 text-primary" />
+                    Overview
+                </h2>
                 <DashboardOverview
                     accounts={accounts}
                     transactions={transactions || []}
@@ -55,17 +65,17 @@ export default async function DashboardPage() {
 
             {/* Accounts Grid */}
             <section>
-                <div className="flex items-center gap-2 mb-4">
-                    <Briefcase className="h-5 w-5 text-foreground" />
-                    <h2 className="text-xl font-semibold text-foreground">
+                <div className="flex items-center gap-2 mb-6">
+                    <Briefcase className="h-5 w-5 text-primary" />
+                    <h2 className="text-2xl font-semibold text-foreground">
                         Your Accounts
                     </h2>
                 </div>
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     <CreateAccountDrawer>
-                        <Card className="hover:shadow-md transition-shadow cursor-pointer border-dashed h-full">
+                        <Card className="hover:shadow-lg transition-shadow cursor-pointer border-dashed border-2 h-full">
                             <CardContent className="flex flex-col items-center justify-center text-muted-foreground h-full py-10">
-                                <Plus className="h-10 w-10 mb-2 text-primary" />
+                                <Plus className="h-10 w-10 mb-3 text-primary" />
                                 <p className="text-sm font-medium">
                                     Add New Account
                                 </p>

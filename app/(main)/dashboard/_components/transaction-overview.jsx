@@ -175,7 +175,7 @@ export function DashboardOverview({ accounts, transactions }) {
                                         fill="#8884d8"
                                         dataKey="value"
                                         label={({ name, value }) =>
-                                            `${name}: $${value.toFixed(2)}`
+                                            `${name}: ₹${value.toFixed(2)}`
                                         }
                                     >
                                         {pieChartData.map((entry, index) => (
@@ -191,7 +191,7 @@ export function DashboardOverview({ accounts, transactions }) {
                                     </Pie>
                                     <Tooltip
                                         formatter={(value) =>
-                                            `$${value.toFixed(2)}`
+                                            `₹${value.toFixed(2)}`
                                         }
                                         contentStyle={{
                                             backgroundColor:

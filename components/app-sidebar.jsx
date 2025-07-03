@@ -42,11 +42,6 @@ const items = [
         icon: BarChart,
     },
     {
-        title: "Export",
-        url: "/export",
-        icon: Calendar,
-    },
-    {
         title: "Settings",
         url: "/settings",
         icon: Settings,
@@ -56,7 +51,7 @@ const items = [
 export function AppSidebar() {
     return (
         <Sidebar>
-            <div className="px-1 py-2 flex justify-center border-b">
+            <div className="px-1 py-3 flex justify-center border-b">
                 <Link href="/">
                     <NextImage
                         src="/light_logo.png"

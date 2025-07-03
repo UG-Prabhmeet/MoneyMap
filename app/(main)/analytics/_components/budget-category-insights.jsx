@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Progress } from "@/components/ui/progress";
-import { defaultCategories, categoryColors } from "@/data/categories";
+import { categoryColors } from "@/data/categories";
 
 export default function BudgetCategoryInsights({ data }) {
     return (

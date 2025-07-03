@@ -449,7 +449,7 @@ export function TransactionTable({ transactions }) {
                                         {transaction.type === "EXPENSE"
                                             ? "-"
                                             : "+"}
-                                        ${transaction.amount.toFixed(2)}
+                                        ₹{transaction.amount.toFixed(2)}
                                     </TableCell>
                                     <TableCell>
                                         {transaction.isRecurring ? (

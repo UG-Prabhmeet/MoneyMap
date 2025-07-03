@@ -186,7 +186,7 @@ export function AddTransactionForm({
                         <SelectContent>
                             {accounts.map((account) => (
                                 <SelectItem key={account.id} value={account.id}>
-                                    {account.name} ($
+                                    {account.name} (₹
                                     {parseFloat(account.balance).toFixed(2)})
                                 </SelectItem>
                             ))}
@@ -336,18 +336,18 @@ export function AddTransactionForm({
             )}
 
             {/* Actions */}
-            <div className="flex gap-4">
+            <div className="flex flex-col sm:flex-row justify-center items-center gap-4 w-full">
                 <Button
                     type="button"
                     variant="outline"
-                    className="w-full"
+                    className="w-full sm:w-40"
                     onClick={() => router.back()}
                 >
                     Cancel
                 </Button>
                 <Button
                     type="submit"
-                    className="w-full"
+                    className="w-full sm:w-40"
                     disabled={transactionLoading}
                 >
                     {transactionLoading ? (

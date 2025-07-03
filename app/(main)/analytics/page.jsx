@@ -10,6 +10,7 @@ import SpendingTrendsChart from "./_components/spending-trends-chart";
 import SavingsGoalTracker from "./_components/savings-goal-tracker";
 import CashFlowChart from "./_components/cash-flow-chart";
 import BudgetCategoryInsights from "./_components/budget-category-insights";
+import { ChartNoAxesColumnIncreasing } from "lucide-react";
 
 export default async function AnalyticsPage() {
     const [
@@ -28,6 +29,10 @@ export default async function AnalyticsPage() {
 
     return (
         <div className="p-6 space-y-8 max-w-6xl mx-auto">
+            <h1 className="text-5xl sm:text-6xl font-bold tracking-tight gradient-title capitalize flex items-center gap-2">
+                <ChartNoAxesColumnIncreasing className="w-7 h-7 text-primary" />
+                Analytics
+            </h1>
             <section className="space-y-4">
                 <h2 className="text-2xl font-bold tracking-tight">
                     Spending Trends
