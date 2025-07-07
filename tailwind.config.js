@@ -7,7 +7,12 @@ module.exports = {
         "./app/**/*.{js,ts,jsx,tsx,mdx}",
     ],
     theme: {
-        extend: {},
+        extend: {
+            fontFamily: {
+                poppins: ["var(--font-poppins)", "sans-serif"], // Use variable for Poppins font
+                playfair: ["var(--font-playfair)", "serif"], // Use variable for Playfair Display font
+            },
+        },
     },
     plugins: [],
 };

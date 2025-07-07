@@ -1,16 +1,18 @@
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/header";
 import { ClerkProvider } from "@clerk/nextjs";
 
-const geistSans = Geist({
-    variable: "--font-geist-sans",
+import { Poppins, Playfair_Display } from "next/font/google";
+const poppins = Poppins({
     subsets: ["latin"],
+    weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+    variable: "--font-poppins", // Use variable for CSS custom properties
 });
 
-const geistMono = Geist_Mono({
-    variable: "--font-geist-mono",
+const playfair = Playfair_Display({
     subsets: ["latin"],
+    weight: ["400", "500", "600", "700", "800", "900"],
+    variable: "--font-playfair", // Use variable for CSS custom properties
 });
 
 export const metadata = {
@@ -22,12 +24,15 @@ export const metadata = {
 export default function RootLayout({ children }) {
     return (
         <ClerkProvider>
-            <html lang="en">
+            <html
+                lang="en"
+                className={`${poppins.variable} ${playfair.variable}`}
+            >
                 <body
-                    className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+                    className={`antialiased ${poppins.variable} ${playfair.variable}`}
                 >
                     <Header />
-                    <main className="min-h-screen mt-20"> {children}</main>
+                    <main className="min-h-screen mt-20">{children}</main>
                 </body>
             </html>
         </ClerkProvider>

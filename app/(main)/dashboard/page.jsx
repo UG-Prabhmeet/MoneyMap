@@ -16,7 +16,6 @@ export default async function DashboardPage() {
     ]);
 
     const defaultAccount = accounts?.find((account) => account.isDefault);
-
     let budgetData = null;
     let financialHealth = null;
 
@@ -26,34 +25,37 @@ export default async function DashboardPage() {
     }
 
     return (
-        <div className="space-y-12 px-6 py-8">
-            {/* Budget Progress */}
-            <section className="bg-background border rounded-2xl shadow-sm p-6">
-                <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
-                    <Briefcase className="h-5 w-5 text-primary" />
-                    Monthly Budget
-                </h2>
-                <BudgetProgress
-                    initialBudget={budgetData?.budget}
-                    currentExpenses={budgetData?.currentExpenses || 0}
-                />
-            </section>
+        <div className="space-y-8 px-4 py-6">
+            {/* Responsive Grid for Top Sections */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Budget Progress */}
+                <section className="bg-background border rounded-xl shadow-sm p-4">
+                    <h2 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
+                        <Briefcase className="h-5 w-5 text-primary" />
+                        Monthly Budget
+                    </h2>
+                    <BudgetProgress
+                        initialBudget={budgetData?.budget}
+                        currentExpenses={budgetData?.currentExpenses || 0}
+                    />
+                </section>
 
-            {/* Financial Health Score */}
-            <section className="bg-background border rounded-2xl shadow-sm p-6">
-                <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
-                    <Briefcase className="h-5 w-5 text-primary" />
-                    Financial Health
-                </h2>
-                <FinancialHealthScore
-                    data={financialHealth}
-                    trend={financialHealth.trend}
-                />
-            </section>
+                {/* Financial Health Score */}
+                <section className="bg-background border rounded-xl shadow-sm p-4">
+                    <h2 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
+                        <Briefcase className="h-5 w-5 text-primary" />
+                        Financial Health
+                    </h2>
+                    <FinancialHealthScore
+                        data={financialHealth}
+                        trend={financialHealth.trend}
+                    />
+                </section>
+            </div>
 
             {/* Dashboard Overview */}
-            <section className="bg-background border rounded-2xl shadow-sm p-6">
-                <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
+            <section className="bg-background border rounded-xl shadow-sm p-4">
+                <h2 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
                     <Briefcase className="h-5 w-5 text-primary" />
                     Overview
                 </h2>
@@ -65,17 +67,17 @@ export default async function DashboardPage() {
 
             {/* Accounts Grid */}
             <section>
-                <div className="flex items-center gap-2 mb-6">
+                <div className="flex items-center gap-2 mb-4">
                     <Briefcase className="h-5 w-5 text-primary" />
-                    <h2 className="text-2xl font-semibold text-foreground">
+                    <h2 className="text-xl font-semibold text-foreground">
                         Your Accounts
                     </h2>
                 </div>
-                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     <CreateAccountDrawer>
-                        <Card className="hover:shadow-lg transition-shadow cursor-pointer border-dashed border-2 h-full">
-                            <CardContent className="flex flex-col items-center justify-center text-muted-foreground h-full py-10">
-                                <Plus className="h-10 w-10 mb-3 text-primary" />
+                        <Card className="hover:shadow-md transition-shadow cursor-pointer border-dashed border-2 h-full">
+                            <CardContent className="flex flex-col items-center justify-center text-muted-foreground h-full py-8">
+                                <Plus className="h-8 w-8 mb-2 text-primary" />
                                 <p className="text-sm font-medium">
                                     Add New Account
                                 </p>
