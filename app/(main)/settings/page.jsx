@@ -5,8 +5,7 @@ export default async function SettingsPage() {
     return (
         <div className="min-h-screen px-6 py-10 space-y-8">
             <div className="flex items-center gap-3">
-                <h1 className="text-5xl sm:text-6xl font-bold tracking-tight gradient-title capitalize flex items-center gap-2">
-                    <Bolt className="w-7 h-7 text-primary" />
+                <h1 className="text-5xl sm:text-6xl font-bold tracking-tight gradient-title capitalize">
                     Settings
                 </h1>
             </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { SignInButton } from "@clerk/nextjs";
 import {
     Accordion,
     AccordionContent,
@@ -8,6 +9,7 @@ import {
     AccordionTrigger,
 } from "@radix-ui/react-accordion";
 import Image from "next/image";
+import Link from "next/link";
 
 const HeroSectionPage = () => {
     const faqs = [
@@ -47,33 +49,33 @@ const HeroSectionPage = () => {
                     top of your savings goals — all from one smart dashboard.
                 </p>
                 <div className="flex flex-col md:flex-row gap-4 justify-center mb-2">
-                    <Button
-                        className="bg-[#26391B] text-white hover:bg-[#1b2713]"
-                        size="lg"
-                    >
-                        Get Started
-                    </Button>
-                    <Button size="lg" variant="outline">
-                        See Dashboard Demo
+                    <SignInButton forceRedirectUrl="/dashboard">
+                        <Button
+                            className="bg-[#26391B] text-white hover:bg-[#1b2713]"
+                            size="lg"
+                        >
+                            Get Started
+                        </Button>
+                    </SignInButton>
+                    <Button size="lg" variant="outline" asChild>
+                        <Link href="https://github.com/UG-Prabhmeet/MoneyMap">
+                            See Code on GitHub
+                        </Link>
                     </Button>
                 </div>
-                <span className="text-xs text-gray-400 mt-2">
-                    No credit card required
-                </span>
             </main>
-
             {/* Image Banner */}
-            <div className="w-full flex justify-center mt-8">
-                <Image
-                    src="/banner.jpg"
-                    width={1440}
-                    height={500}
-                    alt="MoneyMap dashboard"
-                    className="w-full max-w-6xl object-cover rounded-lg"
-                    priority
-                />
+            <div className="w-full flex justify-center mt-8 px-4">
+                <div className="w-full max-w-6xl relative aspect-[3/1] rounded-lg overflow-hidden">
+                    <Image
+                        src="/banner.jpg"
+                        alt="MoneyMap dashboard"
+                        fill
+                        className="object-cover rounded-lg"
+                        priority
+                    />
+                </div>
             </div>
-
             {/* Features Section */}
             <section className="w-full py-24 bg-white flex flex-col items-center">
                 <div className="w-full max-w-6xl px-4">
@@ -83,17 +85,6 @@ const HeroSectionPage = () => {
                             <br />
                             to master your money.
                         </h2>
-                        <div className="flex flex-col items-center md:items-end">
-                            <Button
-                                className="bg-[#26391B] text-white hover:bg-[#1b2713] mb-2"
-                                size="lg"
-                            >
-                                Start Tracking
-                            </Button>
-                            <span className="text-xs text-gray-400">
-                                No credit card required
-                            </span>
-                        </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8 py-4">
@@ -115,7 +106,6 @@ const HeroSectionPage = () => {
                     </div>
                 </div>
             </section>
-
             {/* Quick Start Steps */}
             <section className="w-full py-24 bg-white flex flex-col items-center">
                 <h2 className="font-serif text-4xl md:text-5xl text-center mb-4">
@@ -148,15 +138,12 @@ const HeroSectionPage = () => {
                         desc="See trends, budgets, and insights."
                     />
                 </div>
-
-                <Button className="bg-[#26391B] text-white px-8 py-3 rounded hover:bg-[#1b2713] mb-2">
-                    Start Now
-                </Button>
-                <span className="text-xs text-gray-400">
-                    No credit card required
-                </span>
+                <SignInButton forceRedirectUrl="/dashboard">
+                    <Button className="bg-[#26391B] text-white px-8 py-3 rounded hover:bg-[#1b2713] mb-2">
+                        Start Now
+                    </Button>
+                </SignInButton>
             </section>
-
             {/* FAQ Section */}
             <section className="w-full py-24 bg-white flex flex-col items-center">
                 <div className="w-full max-w-6xl px-4 grid grid-cols-1 md:grid-cols-2 gap-12">
@@ -192,140 +179,48 @@ const HeroSectionPage = () => {
                     </div>
                 </div>
             </section>
-            <footer className="bg-gradient-to-r from-black to-neutral-900 text-white py-12 px-4 mt-16">
-                <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
-                    {/* About / Tagline */}
+            <footer className="bg-gradient-to-r from-black to-neutral-900 text-white py-12 px-6 mt-16">
+                <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12">
+                    {/* Left: Branding & Tagline */}
                     <div>
-                        <span className="text-3xl font-semibold leading-tight">
+                        <h2 className="text-3xl font-semibold leading-tight">
                             MoneyMap
                             <br />
-                            Finance made simple.
-                        </span>
-                        <p className="mt-4 text-sm text-gray-400">
+                            <span className="text-xl font-normal text-gray-300">
+                                Finance made simple.
+                            </span>
+                        </h2>
+                        <p className="mt-4 text-sm text-gray-400 max-w-md">
                             Track, plan, and grow your money — powered by AI and
                             built for modern personal finance.
                         </p>
                     </div>
 
-                    {/* Product Links */}
-                    <div>
-                        <div className="font-semibold mb-2">Product</div>
-                        <ul className="space-y-2 text-sm text-gray-300">
-                            <li>
-                                <a
-                                    href="/dashboard"
-                                    className="hover:underline"
-                                >
-                                    Dashboard
-                                </a>
-                            </li>
-                            <li>
-                                <a href="/add" className="hover:underline">
-                                    Add Transaction
-                                </a>
-                            </li>
-                            <li>
-                                <a
-                                    href="/analytics"
-                                    className="hover:underline"
-                                >
-                                    Analytics
-                                </a>
-                            </li>
-                            <li>
-                                <a href="/account" className="hover:underline">
-                                    My Accounts
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-
-                    {/* Resources */}
-                    <div>
-                        <div className="font-semibold mb-2">Resources</div>
-                        <ul className="space-y-2 text-sm text-gray-300">
-                            <li>
-                                <a href="#" className="hover:underline">
-                                    Help Center
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" className="hover:underline">
-                                    Privacy Policy
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" className="hover:underline">
-                                    Terms of Service
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" className="hover:underline">
-                                    Security
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-
-                    {/* Newsletter + Social */}
-                    <div>
-                        <div className="font-semibold mb-2">Stay Updated</div>
-                        <p className="text-sm text-gray-400 mb-3">
-                            Subscribe for product updates and finance tips.
-                        </p>
-                        <form className="flex flex-col sm:flex-row gap-2">
-                            <input
-                                type="email"
-                                placeholder="you@example.com"
-                                className="px-3 py-2 rounded-md text-black w-full sm:w-auto"
-                            />
-                            <button
-                                type="submit"
-                                className="bg-white text-black px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-200"
+                    {/* Right: Links */}
+                    <div className="flex flex-col md:items-end">
+                        <h3 className="font-semibold text-lg mb-3">Connect</h3>
+                        <div className="flex items-center gap-6 text-xl">
+                            <a
+                                href="#"
+                                aria-label="LinkedIn"
+                                className="hover:text-gray-300 transition-colors"
                             >
-                                Subscribe
-                            </button>
-                        </form>
-
-                        <div className="mt-6">
-                            <div className="font-semibold mb-2">Follow Us</div>
-                            <div className="flex items-center gap-4 text-xl">
-                                <a
-                                    href="#"
-                                    aria-label="Twitter"
-                                    className="hover:text-gray-300"
-                                >
-                                    X
-                                </a>
-                                <a
-                                    href="#"
-                                    aria-label="Instagram"
-                                    className="hover:text-gray-300"
-                                >
-                                    IG
-                                </a>
-                                <a
-                                    href="#"
-                                    aria-label="LinkedIn"
-                                    className="hover:text-gray-300"
-                                >
-                                    in
-                                </a>
-                                <a
-                                    href="#"
-                                    aria-label="GitHub"
-                                    className="hover:text-gray-300"
-                                >
-                                    GH
-                                </a>
-                            </div>
+                                in
+                            </a>
+                            <a
+                                href="#"
+                                aria-label="GitHub"
+                                className="hover:text-gray-300 transition-colors"
+                            >
+                                GH
+                            </a>
                         </div>
                     </div>
                 </div>
 
-                {/* Footer bottom line */}
+                {/* Bottom Bar */}
                 <div className="mt-12 border-t border-white/10 pt-6 text-sm text-gray-500 text-center">
-                    © {new Date().getFullYear()} MoneyMap. All rights reserved.
+                    © {2025} MoneyMap. All rights reserved.
                 </div>
             </footer>
         </div>

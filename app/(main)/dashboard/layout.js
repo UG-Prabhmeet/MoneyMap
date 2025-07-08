@@ -7,8 +7,7 @@ export default function Layout() {
     return (
         <div className="px-4 md:px-6 lg:px-8 py-6">
             <div className="flex items-center justify-between mb-6">
-                <h1 className="text-5xl sm:text-6xl font-bold tracking-tight gradient-title capitalize flex items-center gap-2">
-                    <LayoutDashboard className="w-7 h-7 text-primary" />
+                <h1 className="text-5xl sm:text-6xl font-bold tracking-tight gradient-title capitalize">
                     Dashboard
                 </h1>
             </div>

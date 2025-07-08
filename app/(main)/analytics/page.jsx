@@ -29,8 +29,7 @@ export default async function AnalyticsPage() {
 
     return (
         <div className="p-6 space-y-8 max-w-6xl mx-auto">
-            <h1 className="text-5xl sm:text-6xl font-bold tracking-tight gradient-title capitalize flex items-center gap-2">
-                <ChartNoAxesColumnIncreasing className="w-7 h-7 text-primary" />
+            <h1 className="text-5xl sm:text-6xl font-bold tracking-tight gradient-title capitalize">
                 Analytics
             </h1>
             <section className="space-y-4">

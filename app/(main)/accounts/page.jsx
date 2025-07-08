@@ -15,8 +15,7 @@ export default async function AccountsPage() {
             {/* Page Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-5xl sm:text-6xl font-bold tracking-tight gradient-title capitalize flex items-center gap-2">
-                        <Wallet className="w-7 h-7 text-primary" />
+                    <h1 className="text-5xl sm:text-6xl font-bold tracking-tight gradient-title capitalize">
                         Your Accounts
                     </h1>
                     <p className="text-muted-foreground">
