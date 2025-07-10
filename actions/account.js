@@ -17,12 +17,19 @@ const serializeDecimal = (obj) => {
 };
 
 export async function getAccountWithTransactions(accountId) {
-    const user = await getCurrentUser();
+    const { userId } = await auth();
+    if (!userId) throw new Error("Unauthorized");
+
+    const user = await db.user.findUnique({
+        where: { clerkUserId: userId },
+    });
+
+    if (!user) throw new Error("User not found");
 
     const account = await db.account.findFirst({
         where: {
+            id: accountId,
             userId: user.id,
-            ...(accountId ? { id: accountId } : { isDefault: true }),
         },
         include: {
             transactions: {
@@ -44,7 +51,14 @@ export async function getAccountWithTransactions(accountId) {
 
 export async function bulkDeleteTransactions(transactionIds) {
     try {
-        const user = await getCurrentUser();
+        const { userId } = await auth();
+        if (!userId) throw new Error("Unauthorized");
+
+        const user = await db.user.findUnique({
+            where: { clerkUserId: userId },
+        });
+
+        if (!user) throw new Error("User not found");
 
         // Get transactions to calculate balance changes
         const transactions = await db.transaction.findMany({
@@ -104,7 +118,16 @@ export async function bulkDeleteTransactions(transactionIds) {
 
 export async function updateDefaultAccount(accountId) {
     try {
-        const user = await getCurrentUser();
+        const { userId } = await auth();
+        if (!userId) throw new Error("Unauthorized");
+
+        const user = await db.user.findUnique({
+            where: { clerkUserId: userId },
+        });
+
+        if (!user) {
+            throw new Error("User not found");
+        }
 
         // First, unset any existing default account
         await db.account.updateMany({
@@ -125,7 +148,7 @@ export async function updateDefaultAccount(accountId) {
         });
 
         revalidatePath("/dashboard");
-        return { success: true, data: serializeDecimal(account) };
+        return { success: true, data: serializeTransaction(account) };
     } catch (error) {
         return { success: false, error: error.message };
     }

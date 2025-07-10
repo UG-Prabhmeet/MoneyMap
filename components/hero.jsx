@@ -58,9 +58,7 @@ const HeroSectionPage = () => {
                         </Button>
                     </SignInButton>
                     <Button size="lg" variant="outline" asChild>
-                        <Link href="https://github.com/UG-Prabhmeet/MoneyMap">
-                            See Code on GitHub
-                        </Link>
+                        <Link href="/">See Code on GitHub</Link>
                     </Button>
                 </div>
             </main>
