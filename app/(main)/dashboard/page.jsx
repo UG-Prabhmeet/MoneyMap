@@ -4,7 +4,7 @@ import { AccountCard } from "./_components/account-card";
 import { CreateAccountDrawer } from "@/components/create-account-drawer";
 import { BudgetProgress } from "./_components/budget-progress";
 import { Card, CardContent } from "@/components/ui/card";
-import { Briefcase, Plus } from "lucide-react";
+import { Activity, Briefcase, Plus } from "lucide-react";
 import { DashboardOverview } from "./_components/transaction-overview";
 import FinancialHealthScore from "./_components/financial-health";
 import { getFinancialHealth } from "@/actions/financial-health";
@@ -46,7 +46,7 @@ export default async function DashboardPage() {
                 {financialHealth && (
                     <section className="bg-background border rounded-xl shadow-sm p-4">
                         <h2 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
-                            <Briefcase className="h-5 w-5 text-primary" />
+                            <Activity className="h-5 w-5 text-primary" />
                             Financial Health
                         </h2>
                         <FinancialHealthScore

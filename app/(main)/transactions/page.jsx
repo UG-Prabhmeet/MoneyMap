@@ -13,7 +13,7 @@ export default async function TransactionPage() {
     const { transactions, ...account } = accountData;
 
     return (
-        <div className="space-y-8 px-5">
+        <div className="px-4 md:px-6 lg:px-8 py-6 max-w-screen-2xl mx-auto">
             <div className="flex gap-4 items-end justify-between">
                 <div>
                     <h1 className="text-5xl sm:text-6xl font-bold tracking-tight gradient-title capitalize">

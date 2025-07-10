@@ -1,9 +1,8 @@
-import { Bolt } from "lucide-react";
 import { UserProfile } from "@clerk/nextjs";
 
 export default async function SettingsPage() {
     return (
-        <div className="min-h-screen px-6 py-10 space-y-8">
+        <div className="px-4 md:px-6 lg:px-8 py-6 max-w-screen-2xl mx-auto">
             <div className="flex items-center gap-3">
                 <h1 className="text-5xl sm:text-6xl font-bold tracking-tight gradient-title capitalize">
                     Settings

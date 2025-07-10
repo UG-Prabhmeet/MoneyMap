@@ -11,14 +11,13 @@ export default async function AccountsPage() {
     ]);
 
     return (
-        <div className="px-6 py-8 space-y-8">
-            {/* Page Header */}
+        <div className="px-4 md:px-6 lg:px-8 py-6 max-w-screen-2xl mx-auto">
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-5xl sm:text-6xl font-bold tracking-tight gradient-title capitalize">
                         Your Accounts
                     </h1>
-                    <p className="text-muted-foreground">
+                    <p className="text-muted-foreground pb-6">
                         View, manage, and track your accounts in one place.
                     </p>
                 </div>

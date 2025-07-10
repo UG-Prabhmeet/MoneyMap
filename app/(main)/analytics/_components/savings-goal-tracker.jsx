@@ -16,12 +16,8 @@ export default function SavingsGoalTracker({
         savings > 0 ? Math.ceil(remaining / (savings / 3 || 1)) : "∞";
 
     return (
-        <div className="p-6 bg-background rounded-2xl shadow-lg space-y-4">
-            <h2 className="text-2xl font-semibold text-foreground">
-                🎯 Savings Goal Tracker
-            </h2>
-
-            <div className="text-sm text-muted-foreground">
+        <div className="space-y-4 text-sm">
+            <div className="text-muted-foreground space-y-1">
                 <p>
                     Goal:{" "}
                     <span className="font-medium text-foreground">
@@ -41,7 +37,7 @@ export default function SavingsGoalTracker({
                 className={cn("h-3", percentage >= 100 && "bg-green-500")}
             />
 
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground">
                 Estimated time to goal:{" "}
                 <span className="font-medium text-foreground">
                     {isNaN(estimatedMonths)

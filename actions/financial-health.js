@@ -6,7 +6,7 @@ export async function getFinancialHealth(userId) {
     const now = new Date();
     const start = startOfMonth(now);
 
-    // 🔁 1. Calculate this month's stats
+    // this month's stats
     const [incomeTx, expenseTx, debtTx] = await Promise.all([
         db.transaction.aggregate({
             _sum: { amount: true },
@@ -44,7 +44,7 @@ export async function getFinancialHealth(userId) {
 
     const score = calculateHealthScore(savingsRate, debtToIncome);
 
-    // 🔁 2. Calculate last month's score for trend comparison
+    // last month's score for trend comparison
     const lastMonthStart = startOfMonth(subMonths(new Date(), 1));
 
     const [lastIncomeTx, lastExpenseTx, lastDebtTx] = await Promise.all([
@@ -85,7 +85,7 @@ export async function getFinancialHealth(userId) {
 
     const lastScore = calculateHealthScore(lastSavingsRate, lastDebtToIncome);
 
-    // 🔺 Trend = difference between this month and last
+    // Trend = difference between this month and last
     const trend = score - lastScore;
 
     return {

@@ -1,4 +1,3 @@
-// actions/export.js
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 

@@ -64,11 +64,14 @@ export function BudgetProgress({ initialBudget, currentExpenses }) {
     }, [error]);
 
     return (
-        <Card className="bg-background text-foreground border-border">
+        <Card className="p-6 bg-white rounded-2xl border border-border shadow-md hover:shadow-lg transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <div className="flex-1">
-                    <CardTitle className="text-sm font-medium">
-                        Monthly Budget (Default Account)
+                    <CardTitle className="text-base font-semibold flex items-center gap-2">
+                        Monthly Budget{" "}
+                        <span className="text-xs text-muted-foreground">
+                            (Default Account)
+                        </span>
                     </CardTitle>
                     <div className="flex items-center gap-2 mt-1">
                         {isEditing ? (
@@ -102,21 +105,22 @@ export function BudgetProgress({ initialBudget, currentExpenses }) {
                                 </Button>
                             </div>
                         ) : (
-                            <>
-                                <CardDescription>
-                                    {initialBudget
-                                        ? `₹${currentExpenses.toFixed(2)} of ₹${initialBudget.amount.toFixed(2)} spent`
-                                        : "No budget set"}
+                            <div className="flex items-center justify-between">
+                                <CardDescription className="text-sm text-muted-foreground">
+                                    ₹{currentExpenses.toFixed(2)} of ₹
+                                    {initialBudget.amount.toFixed(2)} spent
                                 </CardDescription>
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() => setIsEditing(true)}
-                                    className="h-6 w-6"
-                                >
-                                    <Pencil className="h-3 w-3" />
-                                </Button>
-                            </>
+                                {!isEditing && (
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() => setIsEditing(true)}
+                                        className="h-6 w-6"
+                                    >
+                                        <Pencil className="h-4 w-4 text-muted-foreground" />
+                                    </Button>
+                                )}
+                            </div>
                         )}
                     </div>
                 </div>
@@ -126,7 +130,7 @@ export function BudgetProgress({ initialBudget, currentExpenses }) {
                     <div className="space-y-2">
                         <Progress
                             value={percentUsed}
-                            extrastyles={`${
+                            extrastyles={`rounded-full h-2 ${
                                 percentUsed >= 90
                                     ? "bg-red-500"
                                     : percentUsed >= 75

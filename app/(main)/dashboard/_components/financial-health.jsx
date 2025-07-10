@@ -26,11 +26,9 @@ export default function FinancialHealthScore({ data, trend }) {
         );
 
     return (
-        <Card className="p-4 space-y-1 bg-background text-foreground border-border">
+        <Card className="p-6 space-y-3 bg-white border border-border shadow-md hover:shadow-lg transition-shadow rounded-2xl">
             <div className="flex items-center gap-2 mb-2">
                 <h2 className="text-lg font-semibold flex items-center gap-2">
-                    <Activity className="h-5 w-5 text-primary" />
-                    Financial Health
                     <Tooltip>
                         <TooltipTrigger>
                             <span className="text-muted-foreground text-sm">
@@ -61,25 +59,29 @@ export default function FinancialHealthScore({ data, trend }) {
             <div className="grid grid-cols-2 md:grid-cols-3 text-sm text-muted-foreground gap-y-1">
                 <div>
                     <p>Income</p>
-                    <p className="text-foreground">₹{data.income}</p>
+                    <p className="text-foreground font-medium">
+                        ₹{data.income}
+                    </p>
                 </div>
                 <div>
                     <p>Expenses</p>
-                    <p className="text-foreground">₹{data.expenses}</p>
+                    <p className="text-foreground font-medium">
+                        ₹{data.expenses}
+                    </p>
                 </div>
                 <div>
                     <p>Debt</p>
-                    <p className="text-foreground">₹{data.debt}</p>
+                    <p className="text-foreground font-medium">₹{data.debt}</p>
                 </div>
                 <div>
                     <p>Savings Rate</p>
-                    <p className="text-foreground">
+                    <p className="text-foreground font-medium">
                         {(data.savingsRate * 100).toFixed(1)}%
                     </p>
                 </div>
                 <div>
                     <p>Debt-to-Income</p>
-                    <p className="text-foreground">
+                    <p className="text-foreground font-medium">
                         {(data.debtToIncome * 100).toFixed(1)}%
                     </p>
                 </div>

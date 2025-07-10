@@ -3,10 +3,16 @@
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { defaultCategories } from "@/data/categories";
-import { getCurrentUser } from "@/lib/getCurrentUser";
 
 export async function getMonthlySpendingTrends() {
-    const user = await getCurrentUser();
+    const { userId } = await auth();
+    if (!userId) throw new Error("Unauthorized");
+
+    const user = await db.user.findUnique({
+        where: { clerkUserId: userId },
+    });
+
+    if (!user) throw new Error("User not found");
 
     const transactions = await db.transaction.findMany({
         where: {
@@ -31,7 +37,7 @@ export async function getMonthlySpendingTrends() {
         const month = date.toLocaleString("default", {
             month: "short",
             year: "numeric",
-        }); // e.g. "Jan 2025"
+        });
 
         if (!monthlyMap[month]) {
             monthlyMap[month] = { month };
@@ -52,7 +58,14 @@ export async function getMonthlySpendingTrends() {
 }
 
 export async function getSavingsSummary() {
-    const user = await getCurrentUser();
+    const { userId } = await auth();
+    if (!userId) throw new Error("Unauthorized");
+
+    const user = await db.user.findUnique({
+        where: { clerkUserId: userId },
+    });
+
+    if (!user) throw new Error("User not found");
 
     const fromDate = new Date();
     fromDate.setMonth(fromDate.getMonth() - 3); // last 3 months
@@ -82,7 +95,14 @@ export async function getSavingsSummary() {
 }
 
 export async function getNetWorthHistory() {
-    const user = await getCurrentUser();
+    const { userId } = await auth();
+    if (!userId) throw new Error("Unauthorized");
+
+    const user = await db.user.findUnique({
+        where: { clerkUserId: userId },
+    });
+
+    if (!user) throw new Error("User not found");
 
     const transactions = await db.transaction.findMany({
         where: { userId: user.id },
@@ -111,7 +131,14 @@ export async function getNetWorthHistory() {
 }
 
 export async function getCashFlowData() {
-    const user = await getCurrentUser();
+    const { userId } = await auth();
+    if (!userId) throw new Error("Unauthorized");
+
+    const user = await db.user.findUnique({
+        where: { clerkUserId: userId },
+    });
+
+    if (!user) throw new Error("User not found");
 
     const transactions = await db.transaction.findMany({
         where: { userId: user.id },
@@ -152,7 +179,14 @@ export async function getCashFlowData() {
 }
 
 export async function getBudgetInsights() {
-    const user = await getCurrentUser();
+    const { userId } = await auth();
+    if (!userId) throw new Error("Unauthorized");
+
+    const user = await db.user.findUnique({
+        where: { clerkUserId: userId },
+    });
+
+    if (!user) throw new Error("User not found");
 
     const currentDate = new Date();
     const startOfMonth = new Date(
@@ -183,7 +217,7 @@ export async function getBudgetInsights() {
         },
     });
 
-    // Default budget per category (hardcoded or dynamic later)
+    // Default budget per category
     const defaultBudgetPerCategory = 5000;
 
     const insights = categories.map((cat) => {

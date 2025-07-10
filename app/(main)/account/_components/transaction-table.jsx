@@ -285,7 +285,7 @@ export function TransactionTable({ transactions }) {
                 </div>
             </div>
             {/* Export Buttons */}
-            <div className="flex justify-end gap-2">
+            <div className="flex flex-col sm:flex-row sm:justify-end gap-2">
                 <Button
                     size="sm"
                     variant="outline"

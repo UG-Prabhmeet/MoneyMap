@@ -6,18 +6,20 @@ import { notFound } from "next/navigation";
 import { AccountChart } from "../_components/account-chart";
 
 export default async function AccountPage({ params }) {
-    const { accountID } = await params;
+    const { id: accountID } = await params;
+    console.log("[AccountPage] Loaded with accountID:", accountID);
     const accountData = await getAccountWithTransactions(accountID);
 
     if (!accountData) {
+        console.warn("Account not found for ID:", accountID);
         notFound();
     }
 
     const { transactions, ...account } = accountData;
 
     return (
-        <div className="space-y-8 px-5">
-            <div className="flex gap-4 items-end justify-between">
+        <div className="px-4 md:px-6 lg:px-8 py-6 max-w-screen-2xl mx-auto">
+            <div className="flex flex-col sm:flex-row gap-4 sm:items-end sm:justify-between">
                 <div>
                     <h1 className="text-5xl sm:text-6xl font-bold tracking-tight gradient-title capitalize">
                         {account.name}

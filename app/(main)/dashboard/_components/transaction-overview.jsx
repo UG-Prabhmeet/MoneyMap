@@ -82,8 +82,8 @@ export function DashboardOverview({ accounts, transactions }) {
     return (
         <div className="grid gap-4 md:grid-cols-2">
             {/* Recent Transactions Card */}
-            <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+            <Card className="bg-white rounded-2xl border border-border shadow-sm">
+                <CardHeader className="flex flex-wrap gap-2 items-start justify-between space-y-0 pb-4">
                     <CardTitle className="text-base font-normal">
                         Recent Transactions
                     </CardTitle>
@@ -91,7 +91,7 @@ export function DashboardOverview({ accounts, transactions }) {
                         value={selectedAccountId}
                         onValueChange={setSelectedAccountId}
                     >
-                        <SelectTrigger className="w-[140px]">
+                        <SelectTrigger className="w-full sm:w-[180px]">
                             <SelectValue placeholder="Select account" />
                         </SelectTrigger>
                         <SelectContent>
@@ -123,7 +123,7 @@ export function DashboardOverview({ accounts, transactions }) {
                                         <p className="text-sm text-muted-foreground">
                                             {format(
                                                 new Date(transaction.date),
-                                                "PP"
+                                                "PPP"
                                             )}
                                         </p>
                                     </div>
@@ -141,7 +141,7 @@ export function DashboardOverview({ accounts, transactions }) {
                                             ) : (
                                                 <ArrowUpRight className="mr-1 h-4 w-4" />
                                             )}
-                                            ${transaction.amount.toFixed(2)}
+                                            ₹{transaction.amount.toFixed(2)}
                                         </div>
                                     </div>
                                 </div>
@@ -152,7 +152,7 @@ export function DashboardOverview({ accounts, transactions }) {
             </Card>
 
             {/* Expense Breakdown Card */}
-            <Card>
+            <Card className="bg-white rounded-2xl border border-border shadow-sm">
                 <CardHeader>
                     <CardTitle className="text-base font-normal">
                         Monthly Expense Breakdown
@@ -171,12 +171,9 @@ export function DashboardOverview({ accounts, transactions }) {
                                         data={pieChartData}
                                         cx="50%"
                                         cy="50%"
-                                        outerRadius={80}
+                                        outerRadius={85}
                                         fill="#8884d8"
                                         dataKey="value"
-                                        label={({ name, value }) =>
-                                            `${name}: ₹${value.toFixed(2)}`
-                                        }
                                     >
                                         {pieChartData.map((entry, index) => (
                                             <Cell
@@ -190,9 +187,10 @@ export function DashboardOverview({ accounts, transactions }) {
                                         ))}
                                     </Pie>
                                     <Tooltip
-                                        formatter={(value) =>
-                                            `₹${value.toFixed(2)}`
-                                        }
+                                        formatter={(value, name) => [
+                                            `₹${value.toFixed(2)}`,
+                                            name,
+                                        ]}
                                         contentStyle={{
                                             backgroundColor:
                                                 "hsl(var(--popover))",
@@ -200,7 +198,16 @@ export function DashboardOverview({ accounts, transactions }) {
                                             borderRadius: "var(--radius)",
                                         }}
                                     />
-                                    <Legend />
+                                    <Legend
+                                        verticalAlign="bottom"
+                                        height={36}
+                                        iconType="circle"
+                                        formatter={(value) => (
+                                            <span className="text-sm text-muted-foreground">
+                                                {value}
+                                            </span>
+                                        )}
+                                    />
                                 </PieChart>
                             </ResponsiveContainer>
                         </div>
