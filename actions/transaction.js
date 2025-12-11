@@ -14,6 +14,33 @@ const serializeAmount = (obj) => ({
     amount: obj.amount.toNumber(),
 });
 
+/**
+ * Calculates the next recurring date based on the start date and interval.
+ * @param {Date} startDate
+ * @param {string} interval - "DAILY", "WEEKLY", "MONTHLY", or "YEARLY"
+ * @returns {Date} The next calculated date
+ */
+function calculateNextRecurringDate(startDate, interval) {
+    const date = new Date(startDate);
+
+    switch (interval) {
+        case "DAILY":
+            date.setDate(date.getDate() + 1);
+            break;
+        case "WEEKLY":
+            date.setDate(date.getDate() + 7);
+            break;
+        case "MONTHLY":
+            date.setMonth(date.getMonth() + 1);
+            break;
+        case "YEARLY":
+            date.setFullYear(date.getFullYear() + 1);
+            break;
+    }
+
+    return date;
+}
+
 // Create Transaction
 export async function createTransaction(data) {
     try {
@@ -236,84 +263,119 @@ export async function getUserTransactions(query = {}) {
 
 // Scan Receipt
 export async function scanReceipt(file) {
-    try {
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const MAX_RETRIES = 3; // Retry up to 3 times
+    let lastError = null;
 
-        // Convert File to ArrayBuffer
-        const arrayBuffer = await file.arrayBuffer();
-        // Convert ArrayBuffer to Base64
-        const base64String = Buffer.from(arrayBuffer).toString("base64");
-
-        const prompt = `
-      Analyze this receipt image and extract the following information in JSON format:
-      - Total amount (just the number)
-      - Date (in ISO format)
-      - Description or items purchased (brief summary)
-      - Merchant/store name
-      - Suggested category (one of: housing,transportation,groceries,utilities,entertainment,food,shopping,healthcare,education,personal,travel,insurance,gifts,bills,other-expense )
-      
-      Only respond with valid JSON in this exact format:
-      {
-        "amount": number,
-        "date": "ISO date string",
-        "description": "string",
-        "merchantName": "string",
-        "category": "string"
-      }
-
-      If its not a recipt, return an empty object
-    `;
-
-        const result = await model.generateContent([
-            {
-                inlineData: {
-                    data: base64String,
-                    mimeType: file.type,
-                },
-            },
-            prompt,
-        ]);
-
-        const response = await result.response;
-        const text = response.text();
-        const cleanedText = text.replace(/```(?:json)?\n?/g, "").trim();
-
+    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
         try {
-            const data = JSON.parse(cleanedText);
-            return {
-                amount: parseFloat(data.amount),
-                date: new Date(data.date),
-                description: data.description,
-                category: data.category,
-                merchantName: data.merchantName,
-            };
-        } catch (parseError) {
-            console.error("Error parsing JSON response:", parseError);
-            throw new Error("Invalid response format from Gemini");
+            const model = genAI.getGenerativeModel({
+                model: "gemini-2.5-flash", // Use the latest stable 2.5 series
+            });
+
+            const arrayBuffer = await file.arrayBuffer();
+            const base64String = Buffer.from(arrayBuffer).toString("base64");
+
+            const prompt = `
+            Analyze this receipt image and extract the following information in JSON format:
+            - Total amount (just the number)
+            - Date (in ISO format)
+            - Description or items purchased (brief summary)
+            - Merchant/store name
+            - Suggested category (one of: housing,transportation,groceries,utilities,entertainment,food,shopping,healthcare,education,personal,travel,insurance,gifts,bills,other-expense)
+            
+            Only respond with valid JSON in this exact format:
+            {
+              "amount": number,
+              "date": "ISO date string",
+              "description": "string",
+              "merchantName": "string",
+              "category": "string"
+            }
+
+            If it's not a receipt, return an empty object {}.
+            `;
+
+            // Wait with exponential backoff before retrying (skip on first attempt)
+            if (attempt > 0) {
+                // Wait for 2^attempt * 1000 milliseconds (2s, 4s)
+                const delay = Math.pow(2, attempt) * 1000;
+                console.log(
+                    `Retrying receipt scan in ${delay / 1000}s... (Attempt ${attempt + 1}/${MAX_RETRIES})`
+                );
+                await new Promise((resolve) => setTimeout(resolve, delay));
+            }
+
+            // Updated content array for 2.5 series SDK compatibility
+            const result = await model.generateContent([
+                {
+                    inlineData: {
+                        data: base64String,
+                        mimeType: file.type || "image/jpeg",
+                    },
+                },
+                { text: prompt },
+            ]);
+
+            const response = await result.response;
+            const text = await response.text();
+
+            // Improved cleaning: removing markdown and potential whitespace
+            const cleanedText = text.replace(/```(?:json)?\n?/g, "").trim();
+
+            try {
+                const data = JSON.parse(cleanedText);
+
+                // Check if data is empty (user uploaded non-receipt)
+                if (Object.keys(data).length === 0) {
+                    throw new Error("No receipt data found in image");
+                }
+
+                return {
+                    amount: parseFloat(data.amount),
+                    date: new Date(data.date),
+                    description: data.description,
+                    category: data.category,
+                    merchantName: data.merchantName,
+                };
+            } catch (parseError) {
+                console.error("Gemini Raw Response:", text);
+                throw new Error(
+                    "Failed to parse receipt data. Please try a clearer photo."
+                );
+            }
+        } catch (error) {
+            lastError = error;
+            console.error(
+                `Error scanning receipt on attempt ${attempt + 1}:`,
+                error
+            );
+
+            // Check if the error is a transient 503 Service Unavailable or model overloaded
+            // We only retry on these specific external API issues.
+            const isTransientError =
+                error.message.includes("503 Service Unavailable") ||
+                error.message.includes("The model is overloaded");
+
+            // If it's a non-transient error (like 400 Bad Request, 401 Unauthorized, etc.) or rate limit,
+            // we re-throw immediately.
+            if (!isTransientError) {
+                // Specifically handle the 429 error for the user
+                if (error.message.includes("429")) {
+                    throw new Error(
+                        "Daily free limit reached for receipt scanning."
+                    );
+                }
+                throw new Error(error.message || "Failed to scan receipt");
+            }
+
+            // If it IS a transient error (503), the loop will continue to the next attempt.
+            if (attempt === MAX_RETRIES - 1) {
+                // If this was the last attempt, re-throw the last error message
+                throw new Error(
+                    lastError.message ||
+                        "Failed to scan receipt after multiple retries"
+                );
+            }
         }
-    } catch (error) {
-        console.error("Error scanning receipt:", error);
-        throw new Error("Failed to scan receipt");
     }
-}
-
-function calculateNextRecurringDate(startDate, interval) {
-    const date = new Date(startDate);
-
-    switch (interval) {
-        case "DAILY":
-            date.setDate(date.getDate() + 1);
-            break;
-        case "WEEKLY":
-            date.setDate(date.getDate() + 7);
-            break;
-        case "MONTHLY":
-            date.setMonth(date.getMonth() + 1);
-            break;
-        case "YEARLY":
-            date.setFullYear(date.getFullYear() + 1);
-            break;
-    }
-
-    return date;
 }
