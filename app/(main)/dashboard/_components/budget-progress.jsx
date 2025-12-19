@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { updateBudget } from "@/actions/budget";
 
-export function BudgetProgress({ initialBudget, currentExpenses }) {
+export function BudgetProgress({ initialBudget, currentExpenses = 0 }) {
     const [isEditing, setIsEditing] = useState(false);
     const [newBudget, setNewBudget] = useState(
         initialBudget?.amount?.toString() || ""
@@ -30,9 +30,10 @@ export function BudgetProgress({ initialBudget, currentExpenses }) {
         error,
     } = useFetch(updateBudget);
 
-    const percentUsed = initialBudget
-        ? (currentExpenses / initialBudget.amount) * 100
-        : 0;
+    // Safe calculation: if no budget exists, use 0 to avoid division by zero
+    const budgetAmount = initialBudget?.amount ?? 0;
+    const percentUsed =
+        budgetAmount > 0 ? (currentExpenses / budgetAmount) * 100 : 0;
 
     const handleUpdateBudget = async () => {
         const amount = parseFloat(newBudget);
@@ -105,44 +106,44 @@ export function BudgetProgress({ initialBudget, currentExpenses }) {
                                 </Button>
                             </div>
                         ) : (
-                            <div className="flex items-center justify-between">
+                            <div className="flex items-center justify-between w-full">
                                 <CardDescription className="text-sm text-muted-foreground">
+                                    {/* FIXED: Added null checks for initialBudget.amount */}
                                     ₹{currentExpenses.toFixed(2)} of ₹
-                                    {initialBudget.amount.toFixed(2)} spent
+                                    {(initialBudget?.amount ?? 0).toFixed(2)}{" "}
+                                    spent
                                 </CardDescription>
-                                {!isEditing && (
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        onClick={() => setIsEditing(true)}
-                                        className="h-6 w-6"
-                                    >
-                                        <Pencil className="h-4 w-4 text-muted-foreground" />
-                                    </Button>
-                                )}
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => setIsEditing(true)}
+                                    className="h-6 w-6"
+                                >
+                                    <Pencil className="h-4 w-4 text-muted-foreground" />
+                                </Button>
                             </div>
                         )}
                     </div>
                 </div>
             </CardHeader>
             <CardContent>
-                {initialBudget && (
-                    <div className="space-y-2">
-                        <Progress
-                            value={percentUsed}
-                            extrastyles={`rounded-full h-2 ${
-                                percentUsed >= 90
-                                    ? "bg-red-500"
-                                    : percentUsed >= 75
-                                      ? "bg-yellow-500"
-                                      : "bg-green-500"
-                            }`}
-                        />
-                        <p className="text-xs text-muted-foreground text-right">
-                            {percentUsed.toFixed(1)}% used
-                        </p>
-                    </div>
-                )}
+                {/* Always show the bar, but it will be empty if initialBudget is null */}
+                <div className="space-y-2">
+                    <Progress
+                        value={percentUsed}
+                        className="rounded-full h-2"
+                        indicatorClassName={
+                            percentUsed >= 100
+                                ? "bg-red-500"
+                                : percentUsed <= 30
+                                  ? "bg-green-500"
+                                  : "bg-yellow-500"
+                        }
+                    />
+                    <p className="text-xs text-muted-foreground text-right">
+                        {percentUsed.toFixed(1)}% used
+                    </p>
+                </div>
             </CardContent>
         </Card>
     );
