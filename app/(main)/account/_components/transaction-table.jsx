@@ -56,6 +56,7 @@ import { BarLoader } from "react-spinners";
 import { useRouter } from "next/navigation";
 import { exportToCSV, exportToPDF } from "@/actions/export";
 
+// Constants for UI and Logic
 const ITEMS_PER_PAGE = 10;
 
 const RECURRING_INTERVALS = {
@@ -66,6 +67,7 @@ const RECURRING_INTERVALS = {
 };
 
 export function TransactionTable({ transactions }) {
+    // --- State Management ---
     const [selectedIds, setSelectedIds] = useState([]);
     const [sortConfig, setSortConfig] = useState({
         field: "date",
@@ -77,11 +79,12 @@ export function TransactionTable({ transactions }) {
     const [currentPage, setCurrentPage] = useState(1);
     const router = useRouter();
 
-    // Memoized filtered and sorted transactions
+    // --- Data Processing (Filtering & Sorting) ---
+    // useMemo ensures we only recalculate when inputs change, optimizing performance
     const filteredAndSortedTransactions = useMemo(() => {
         let result = [...transactions];
 
-        // Apply search filter
+        // 1. Search Filter (Description-based)
         if (searchTerm) {
             const searchLower = searchTerm.toLowerCase();
             result = result.filter((transaction) =>
@@ -89,14 +92,14 @@ export function TransactionTable({ transactions }) {
             );
         }
 
-        // Apply type filter
+        // 2. Type Filter (Income/Expense)
         if (typeFilter) {
             result = result.filter(
                 (transaction) => transaction.type === typeFilter
             );
         }
 
-        // Apply recurring filter
+        // 3. Recurring Status Filter
         if (recurringFilter) {
             result = result.filter((transaction) => {
                 if (recurringFilter === "recurring")
@@ -105,7 +108,7 @@ export function TransactionTable({ transactions }) {
             });
         }
 
-        // Apply sorting
+        // 4. Sorting Logic
         result.sort((a, b) => {
             let comparison = 0;
 
@@ -129,10 +132,11 @@ export function TransactionTable({ transactions }) {
         return result;
     }, [transactions, searchTerm, typeFilter, recurringFilter, sortConfig]);
 
-    // Pagination calculations
+    // --- Pagination Calculations ---
     const totalPages = Math.ceil(
         filteredAndSortedTransactions.length / ITEMS_PER_PAGE
     );
+    
     const paginatedTransactions = useMemo(() => {
         const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
         return filteredAndSortedTransactions.slice(
@@ -141,6 +145,9 @@ export function TransactionTable({ transactions }) {
         );
     }, [filteredAndSortedTransactions, currentPage]);
 
+    // --- Event Handlers ---
+    
+    // Toggles sort direction or changes the active sort field
     const handleSort = (field) => {
         setSortConfig((current) => ({
             field,
@@ -151,6 +158,7 @@ export function TransactionTable({ transactions }) {
         }));
     };
 
+    // Toggle individual row selection
     const handleSelect = (id) => {
         setSelectedIds((current) =>
             current.includes(id)
@@ -159,6 +167,7 @@ export function TransactionTable({ transactions }) {
         );
     };
 
+    // Select/Deselect all rows on the current page
     const handleSelectAll = () => {
         setSelectedIds((current) =>
             current.length === paginatedTransactions.length
@@ -167,6 +176,7 @@ export function TransactionTable({ transactions }) {
         );
     };
 
+    // Custom hook for handling the bulk delete API call
     const {
         loading: deleteLoading,
         fn: deleteFn,
@@ -184,6 +194,7 @@ export function TransactionTable({ transactions }) {
         deleteFn(selectedIds);
     };
 
+    // Side effect to notify user of successful deletion
     useEffect(() => {
         if (deleted && !deleteLoading) {
             toast.error("Transactions deleted successfully");
@@ -199,15 +210,17 @@ export function TransactionTable({ transactions }) {
 
     const handlePageChange = (newPage) => {
         setCurrentPage(newPage);
-        setSelectedIds([]); // Clear selections on page change
+        setSelectedIds([]); // Reset selection when navigating to a new page
     };
 
     return (
         <div className="space-y-4">
+            {/* Show loading bar during bulk deletion */}
             {deleteLoading && (
                 <BarLoader className="mt-4" width={"100%"} color="#9333ea" />
             )}
-            {/* Filters */}
+
+            {/* --- Filter Bar --- */}
             <div className="flex flex-col sm:flex-row gap-4">
                 <div className="relative flex-1">
                     <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -221,7 +234,9 @@ export function TransactionTable({ transactions }) {
                         className="pl-8"
                     />
                 </div>
+                
                 <div className="flex gap-2">
+                    {/* Income/Expense Filter */}
                     <Select
                         value={typeFilter}
                         onValueChange={(value) => {
@@ -238,6 +253,7 @@ export function TransactionTable({ transactions }) {
                         </SelectContent>
                     </Select>
 
+                    {/* Recurring Filter */}
                     <Select
                         value={recurringFilter}
                         onValueChange={(value) => {
@@ -258,7 +274,7 @@ export function TransactionTable({ transactions }) {
                         </SelectContent>
                     </Select>
 
-                    {/* Bulk Actions */}
+                    {/* Bulk Action: Delete */}
                     {selectedIds.length > 0 && (
                         <div className="flex items-center gap-2">
                             <Button
@@ -272,6 +288,7 @@ export function TransactionTable({ transactions }) {
                         </div>
                     )}
 
+                    {/* Clear Filters Button */}
                     {(searchTerm || typeFilter || recurringFilter) && (
                         <Button
                             variant="outline"
@@ -284,7 +301,8 @@ export function TransactionTable({ transactions }) {
                     )}
                 </div>
             </div>
-            {/* Export Buttons */}
+
+            {/* --- Export Options --- */}
             <div className="flex flex-col sm:flex-row sm:justify-end gap-2">
                 <Button
                     size="sm"
@@ -331,7 +349,7 @@ export function TransactionTable({ transactions }) {
                 </Button>
             </div>
 
-            {/* Transactions Table */}
+            {/* --- Data Table --- */}
             <div className="rounded-md border">
                 <Table>
                     <TableHeader>
@@ -497,6 +515,7 @@ export function TransactionTable({ transactions }) {
                                         )}
                                     </TableCell>
                                     <TableCell>
+                                        {/* Action Menu (Edit/Delete) */}
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
                                                 <Button
@@ -537,7 +556,7 @@ export function TransactionTable({ transactions }) {
                 </Table>
             </div>
 
-            {/* Pagination */}
+            {/* --- Pagination Controls --- */}
             {totalPages > 1 && (
                 <div className="flex items-center justify-center gap-2">
                     <Button

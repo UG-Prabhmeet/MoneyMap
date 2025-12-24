@@ -14,12 +14,6 @@ const serializeAmount = (obj) => ({
     amount: obj.amount.toNumber(),
 });
 
-/**
- * Calculates the next recurring date based on the start date and interval.
- * @param {Date} startDate
- * @param {string} interval - "DAILY", "WEEKLY", "MONTHLY", or "YEARLY"
- * @returns {Date} The next calculated date
- */
 function calculateNextRecurringDate(startDate, interval) {
     const date = new Date(startDate);
 
