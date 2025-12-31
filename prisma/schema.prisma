@@ -8,7 +8,6 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-// Core User model to track identity and associated financial data
 model User {
   id            String    @id @default(uuid())
   clerkUserId   String    @unique // link to Clerk auth user
@@ -16,20 +15,19 @@ model User {
   name          String?
   imageUrl      String?
   transactions  Transaction[] // all transactions across all accounts
-  accounts      Account[]     // multiple bank/pocket accounts
-  budgets       Budget[]      // user-defined spending limits
+  accounts      Account[]     // multiple accounts
+  budget        Budget?    
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 
   @@map("users")
 }
 
-// Represents different financial accounts (e.g., Savings, Current)
 model Account {
   id           String        @id @default(uuid())
   name         String
   type         AccountType   // INCOME or EXPENSE
-  balance      Decimal       @default(0) // dynamic balance updated by transactions
+  balance      Decimal       @default(0) 
   isDefault    Boolean       @default(false)
   userId       String
   user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -41,7 +39,6 @@ model Account {
   @@map("accounts")
 }
 
-// Individual financial records (purchases, deposits, recurring items)
 model Transaction {
   id                String            @id @default(uuid())
   type             TransactionType
@@ -51,9 +48,9 @@ model Transaction {
   category         String           
   receiptUrl       String?
   isRecurring      Boolean           @default(false)
-  recurringInterval RecurringInterval? // DAILY, WEEKLY, etc.
-  nextRecurringDate DateTime?         // scheduled date for next occurrence
-  lastProcessed    DateTime?         // audit trail for Inngest automation
+  recurringInterval RecurringInterval? 
+  nextRecurringDate DateTime?        
+  lastProcessed    DateTime?       
   status           TransactionStatus  @default(COMPLETED)
   userId           String
   user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -67,11 +64,10 @@ model Transaction {
   @@map("transactions")
 }
 
-// Monthly spending targets for alerting and visualization
 model Budget {
   id          String       @id @default(uuid())
   amount      Decimal
-  lastAlertSent DateTime?  // prevents spamming multiple alerts per month
+  lastAlertSent DateTime?  
   userId      String       @unique
   user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt   DateTime     @default(now())
