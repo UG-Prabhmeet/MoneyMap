@@ -8,14 +8,16 @@ import useFetch from "@/hooks/use-fetch";
 import { scanReceipt } from "@/actions/transaction";
 
 export function ReceiptScanner({ onScanComplete }) {
-    const fileInputRef = useRef(null);
+    const fileInputRef = useRef(null); // reference to file input element
 
+    // custom hook for fetching data with loading and error handling
     const {
         loading: scanReceiptLoading,
         fn: scanReceiptFn,
         data: scannedData,
     } = useFetch(scanReceipt);
 
+    // validate file size and trigger scanReceiptFn (from transaction server action)
     const handleReceiptScan = async (file) => {
         if (file.size > 5 * 1024 * 1024) {
             toast.error("File size should be less than 5MB");
@@ -25,6 +27,7 @@ export function ReceiptScanner({ onScanComplete }) {
         await scanReceiptFn(file);
     };
 
+    // watch for result from server action and notify parent component [AddTransactionForm]
     useEffect(() => {
         if (scannedData && !scanReceiptLoading) {
             onScanComplete(scannedData);

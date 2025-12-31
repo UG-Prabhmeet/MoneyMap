@@ -38,18 +38,20 @@ function calculateNextRecurringDate(startDate, interval) {
 // Create Transaction
 export async function createTransaction(data) {
     try {
+        // Verify user authentication using Clerk
         const { userId } = await auth();
         if (!userId) throw new Error("Unauthorized");
 
-        // Get request data for ArcJet
+        // Initialize Arcjet request tracking
         const req = await request();
 
-        // Check rate limit
+        // Check if the user has exceeded their rate limit (rate limits are configured in lib/arcjet.js)
         const decision = await aj.protect(req, {
             userId,
-            requested: 1,
+            requested: 1, // Consume 1 token from the bucket
         });
 
+        // Handle denied requests (e.g., rate limit exceeded)
         if (decision.isDenied()) {
             if (decision.reason.isRateLimit()) {
                 const { remaining, reset } = decision.reason;
@@ -255,20 +257,23 @@ export async function getUserTransactions(query = {}) {
     }
 }
 
-// Scan Receipt
+// Server action to process the receipt image using Google Gemini AI.
 export async function scanReceipt(file) {
-    const MAX_RETRIES = 3; // Retry up to 3 times
+    const MAX_RETRIES = 3; 
     let lastError = null;
 
     for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
         try {
+            // Initialize the Gemini model
             const model = genAI.getGenerativeModel({
-                model: "gemini-2.5-flash", // Use the latest stable 2.5 series
+                model: "gemini-2.5-flash",
             });
 
-            const arrayBuffer = await file.arrayBuffer();
-            const base64String = Buffer.from(arrayBuffer).toString("base64");
+            // Convert the uploaded file to a Base64 string for the Gemini API
+            const arrayBuffer = await file.arrayBuffer(); // arrary buffer = binary data
+            const base64String = Buffer.from(arrayBuffer).toString("base64"); // base64 string = text data
 
+            // prompt for structured data extraction
             const prompt = `
             Analyze this receipt image and extract the following information in JSON format:
             - Total amount (just the number)
@@ -289,9 +294,8 @@ export async function scanReceipt(file) {
             If it's not a receipt, return an empty object {}.
             `;
 
-            // Wait with exponential backoff before retrying (skip on first attempt)
+            // Wait with exponential backoff if this is a retry attempt (to avoid spamming on transient errors)
             if (attempt > 0) {
-                // Wait for 2^attempt * 1000 milliseconds (2s, 4s)
                 const delay = Math.pow(2, attempt) * 1000;
                 console.log(
                     `Retrying receipt scan in ${delay / 1000}s... (Attempt ${attempt + 1}/${MAX_RETRIES})`
@@ -299,7 +303,7 @@ export async function scanReceipt(file) {
                 await new Promise((resolve) => setTimeout(resolve, delay));
             }
 
-            // Updated content array for 2.5 series SDK compatibility
+            // Send image and prompt to Gemini
             const result = await model.generateContent([
                 {
                     inlineData: {
@@ -313,17 +317,18 @@ export async function scanReceipt(file) {
             const response = await result.response;
             const text = await response.text();
 
-            // Improved cleaning: removing markdown and potential whitespace
+            // Clean the response text (remove markdown markers if AI included them)
             const cleanedText = text.replace(/```(?:json)?\n?/g, "").trim();
 
             try {
                 const data = JSON.parse(cleanedText);
 
-                // Check if data is empty (user uploaded non-receipt)
+                // If the AI returned an empty object, it means it didn't recognize a receipt
                 if (Object.keys(data).length === 0) {
                     throw new Error("No receipt data found in image");
                 }
 
+                // Return structured data to the frontend
                 return {
                     amount: parseFloat(data.amount),
                     date: new Date(data.date),
@@ -344,16 +349,13 @@ export async function scanReceipt(file) {
                 error
             );
 
-            // Check if the error is a transient 503 Service Unavailable or model overloaded
-            // We only retry on these specific external API issues.
+            // Retry logic: Only retry on transient Errors like 503 (service unavailable)
             const isTransientError =
                 error.message.includes("503 Service Unavailable") ||
                 error.message.includes("The model is overloaded");
 
-            // If it's a non-transient error (like 400 Bad Request, 401 Unauthorized, etc.) or rate limit,
-            // we re-throw immediately.
             if (!isTransientError) {
-                // Specifically handle the 429 error for the user
+                // If it's a 429 error, it's a quota limit, so we don't retry and notify the user
                 if (error.message.includes("429")) {
                     throw new Error(
                         "Daily free limit reached for receipt scanning."
@@ -362,9 +364,8 @@ export async function scanReceipt(file) {
                 throw new Error(error.message || "Failed to scan receipt");
             }
 
-            // If it IS a transient error (503), the loop will continue to the next attempt.
+            // If we've reached the last retry, propagate the error
             if (attempt === MAX_RETRIES - 1) {
-                // If this was the last attempt, re-throw the last error message
                 throw new Error(
                     lastError.message ||
                         "Failed to scan receipt after multiple retries"

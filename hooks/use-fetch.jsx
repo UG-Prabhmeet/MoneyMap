@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 
+// custom hook for fetching data with loading and error handling
 const useFetch = (cb) => {
     const [data, setData] = useState(undefined);
     const [loading, setLoading] = useState(null);

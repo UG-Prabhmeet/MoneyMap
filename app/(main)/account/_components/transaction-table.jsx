@@ -304,6 +304,7 @@ export function TransactionTable({ transactions }) {
 
             {/* --- Export Options --- */}
             <div className="flex flex-col sm:flex-row sm:justify-end gap-2">
+                {/* Export only the rows the user has manually checked */}
                 <Button
                     size="sm"
                     variant="outline"
@@ -333,6 +334,7 @@ export function TransactionTable({ transactions }) {
                     Export Selected (PDF)
                 </Button>
 
+                {/* Export all rows that match the current filters/search (ignoring individual selection) */}
                 <Button
                     size="sm"
                     variant="default"

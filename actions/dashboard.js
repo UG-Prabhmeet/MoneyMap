@@ -54,13 +54,13 @@ export async function createAccount(data) {
         const { userId } = await auth();
         if (!userId) throw new Error("Unauthorized");
 
-        // Get request data for ArcJet
+        // Initialize Arcjet request tracking
         const req = await request();
 
-        // Check rate limit
+        // Apply rate limiting (e.g., to prevent bots from spamming account creation)
         const decision = await aj.protect(req, {
             userId,
-            requested: 1,
+            requested: 1, // Consume 1 token
         });
 
         if (decision.isDenied()) {

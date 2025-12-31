@@ -94,6 +94,7 @@ export function AddTransactionForm({
         }
     };
 
+    // update form fields with data extracted by AI
     const handleScanComplete = (scannedData) => {
         if (scannedData) {
             setValue("amount", scannedData.amount.toString());

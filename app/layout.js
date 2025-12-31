@@ -24,6 +24,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
     return (
+        // Wrap the entire app with ClerkProvider to enable authentication context
         <ClerkProvider>
             <html
                 lang="en"
