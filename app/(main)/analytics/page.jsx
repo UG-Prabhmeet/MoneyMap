@@ -5,6 +5,7 @@ import {
     getMonthlySpendingTrends,
 } from "@/actions/analytics";
 import { getCurrentBudget } from "@/actions/budget";
+import { getUserAccounts } from "@/actions/dashboard";
 import {
     Card,
     CardContent,
@@ -21,32 +22,38 @@ import SavingsGoalTracker from "./_components/savings-goal-tracker";
 import CashFlowChart from "./_components/cash-flow-chart";
 
 export default async function AnalyticsPage() {
+    const accounts = await getUserAccounts();
+    const defaultAccount = accounts?.find((a) => a.isDefault) || accounts?.[0];
+
     const [trendData, budgetInfo, netWorthData, cashFlowData] =
         await Promise.all([
-            getMonthlySpendingTrends(),
-            getCurrentBudget(),
-            getNetWorthHistory(),
-            getCashFlowData(),
+            getMonthlySpendingTrends(defaultAccount?.id),
+            getCurrentBudget(defaultAccount?.id),
+            getNetWorthHistory(defaultAccount?.id),
+            getCashFlowData(defaultAccount?.id),
         ]);
 
     // Check if we have enough data to show meaningful charts
     const hasData = trendData?.length > 0 || netWorthData?.length > 0;
 
     return (
-        <div className="container px-4 md:px-6 py-10 max-w-7xl mx-auto space-y-8">
+        <div className="px-4 md:px-6 lg:px-8 py-6 max-w-screen-2xl mx-auto">
+            
             {/* Header Section */}
-            <div className="flex flex-col gap-2">
-                <h1 className="text-4xl md:text-5xl font-bold tracking-tight gradient-title">
-                    Financial Analytics
-                </h1>
-                <p className="text-slate-500 text-lg">
-                    Comprehensive insights into your wealth, spending, and cash
-                    flow.
-                </p>
+
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-5xl sm:text-6xl font-bold tracking-tight gradient-title capitalize">
+                        Financial Analytics
+                    </h1>
+                    <p className="text-muted-foreground pb-6">
+                        Insights for your {defaultAccount?.name || "current account"}. Track your wealth, spending, and cash flow in one place.
+                    </p>
+                </div>
             </div>
 
             {!hasData && (
-                <Alert className="bg-blue-50 border-blue-200">
+                <Alert className="bg-blue-50 border-blue-200 pb-6">
                     <InfoIcon className="h-4 w-4 text-blue-600" />
                     <AlertTitle className="text-blue-800">
                         New Account
@@ -59,7 +66,7 @@ export default async function AnalyticsPage() {
             )}
 
             {/* Top Grid: Savings Tracker & Net Worth */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 pb-5">
                 <Card className="lg:col-span-4 shadow-sm border-slate-200">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
@@ -74,6 +81,8 @@ export default async function AnalyticsPage() {
                         <SavingsGoalTracker
                             income={budgetInfo?.budget?.amount || 0}
                             expense={budgetInfo?.currentExpenses || 0}
+                            initialGoal={defaultAccount?.savingsGoal || 0}
+                            accountId={defaultAccount?.id}
                         />
                     </CardContent>
                 </Card>
@@ -105,7 +114,8 @@ export default async function AnalyticsPage() {
             </Card>
 
             {/* Bottom Section: Cash Flow */}
-            <Card className="shadow-sm border-slate-200">
+            <div className="pt-5">
+                <Card className="shadow-sm border-slate-200">
                 <CardHeader>
                     <CardTitle>Cash Flow Analysis</CardTitle>
                     <CardDescription>
@@ -116,6 +126,8 @@ export default async function AnalyticsPage() {
                     <CashFlowChart data={cashFlowData} />
                 </CardContent>
             </Card>
+            </div>
+            
         </div>
     );
 }

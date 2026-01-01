@@ -49,7 +49,7 @@ export function AccountCard({ account }) {
     }, [error]);
 
     return (
-        <Card className="bg-white border border-border shadow-md hover:shadow-lg transition-shadow rounded-2xl">
+        <Card className="bg-white border border-border shadow-md hover:shadow-lg transition-shadow rounded-2xl h-full min-h-[160px]">
             <Link href={`/account/${id}`}>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium capitalize">
@@ -62,21 +62,21 @@ export function AccountCard({ account }) {
                     />
                 </CardHeader>
                 <CardContent>
-                    <div className="text-2xl font-bold">
+                    <div className="text-2xl font-bold pb-2">
                         ₹{parseFloat(balance).toFixed(2)}
                     </div>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs text-muted-foreground pb-3">
                         {type.charAt(0) + type.slice(1).toLowerCase()} Account
                     </p>
                 </CardContent>
                 <CardFooter className="flex justify-between text-sm text-muted-foreground">
                     <div className="flex items-center">
                         <ArrowUpRight className="mr-1 h-4 w-4 text-green-500" />
-                        Income
+                        Income: ₹{account.income?.toLocaleString()}
                     </div>
                     <div className="flex items-center">
                         <ArrowDownRight className="mr-1 h-4 w-4 text-red-500" />
-                        Expense
+                        Expense: ₹{account.expense?.toLocaleString()}
                     </div>
                 </CardFooter>
             </Link>

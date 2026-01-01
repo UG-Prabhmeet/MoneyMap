@@ -19,9 +19,9 @@ export default async function AddTransactionPage({ searchParams }) {
 
     return (
         // Added flex flex-col items-center to ensure all children are horizontally centered
-        <div className="container max-w-3xl py-10 px-4 sm:px-6 lg:px-8 flex flex-col items-center space-y-10 mx-auto">
+        <div className="px-4 md:px-6 lg:px-8 py-6 max-w-screen-2xl mx-auto">
             {/* Dynamic Header - Added text-center and items-center */}
-            <div className="flex flex-col items-center text-center gap-4 w-full">
+            <div className="flex gap-4 items-end justify-between pb-4">
                 <div className="flex items-center justify-center gap-3">
                     <div className="p-3 bg-primary/10 rounded-2xl">
                         {editId ? (
@@ -30,15 +30,10 @@ export default async function AddTransactionPage({ searchParams }) {
                             <PlusCircle className="w-8 h-8 text-primary" />
                         )}
                     </div>
-                    <h1 className="text-4xl md:text-5xl font-bold tracking-tight gradient-title">
+                    <h1 className="text-5xl sm:text-6xl font-bold tracking-tight gradient-title capitalize">
                         {editId ? "Edit Transaction" : "Add Transaction"}
                     </h1>
                 </div>
-                <p className="text-slate-500 text-lg max-w-lg">
-                    {editId
-                        ? "Update the details of your existing record."
-                        : "Record a new expense, income, or transfer to keep your data current."}
-                </p>
             </div>
 
             {/* Form Container - w-full ensures it respects the max-w-3xl of the parent */}
@@ -52,12 +47,6 @@ export default async function AddTransactionPage({ searchParams }) {
                     />
                 </CardContent>
             </Card>
-
-            {/* Subtle Helper Text */}
-            <p className="text-sm text-slate-400 italic">
-                Tip: You can use the AI receipt scanner to fill this form
-                automatically.
-            </p>
         </div>
     );
 }

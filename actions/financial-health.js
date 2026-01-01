@@ -2,28 +2,37 @@ import { db } from "@/lib/prisma";
 import { startOfMonth, subMonths } from "date-fns";
 import { DEBT_CATEGORY_IDS } from "@/data/categories";
 
-export async function getFinancialHealth(userId) {
+// get financial health of user
+export async function getFinancialHealth(userId, accountId) {
     const now = new Date();
     const start = startOfMonth(now);
 
     // this month's stats
     const [incomeTx, expenseTx, debtTx] = await Promise.all([
+
+        // all income transactions
         db.transaction.aggregate({
             _sum: { amount: true },
             where: {
                 userId,
                 type: "INCOME",
                 date: { gte: start },
+                ...(accountId ? { accountId } : {}),
             },
         }),
+        
+        // all expense transactions
         db.transaction.aggregate({
             _sum: { amount: true },
             where: {
                 userId,
                 type: "EXPENSE",
                 date: { gte: start },
+                ...(accountId ? { accountId } : {}),
             },
         }),
+
+        // all debt transactions
         db.transaction.aggregate({
             _sum: { amount: true },
             where: {
@@ -31,6 +40,7 @@ export async function getFinancialHealth(userId) {
                 type: "EXPENSE",
                 category: { in: DEBT_CATEGORY_IDS },
                 date: { gte: start },
+                ...(accountId ? { accountId } : {}),
             },
         }),
     ]);
@@ -48,22 +58,27 @@ export async function getFinancialHealth(userId) {
     const lastMonthStart = startOfMonth(subMonths(new Date(), 1));
 
     const [lastIncomeTx, lastExpenseTx, lastDebtTx] = await Promise.all([
+        // last month all income transactions
         db.transaction.aggregate({
             _sum: { amount: true },
             where: {
                 userId,
                 type: "INCOME",
                 date: { gte: lastMonthStart, lt: start },
+                ...(accountId ? { accountId } : {}),
             },
         }),
+        // last month all expense transactions
         db.transaction.aggregate({
             _sum: { amount: true },
             where: {
                 userId,
                 type: "EXPENSE",
                 date: { gte: lastMonthStart, lt: start },
+                ...(accountId ? { accountId } : {}),
             },
         }),
+        // last month all debt transactions
         db.transaction.aggregate({
             _sum: { amount: true },
             where: {
@@ -71,6 +86,7 @@ export async function getFinancialHealth(userId) {
                 type: "EXPENSE",
                 category: { in: DEBT_CATEGORY_IDS },
                 date: { gte: lastMonthStart, lt: start },
+                ...(accountId ? { accountId } : {}),
             },
         }),
     ]);
@@ -85,7 +101,7 @@ export async function getFinancialHealth(userId) {
 
     const lastScore = calculateHealthScore(lastSavingsRate, lastDebtToIncome);
 
-    // Trend = difference between this month and last
+    // trend = difference between this month and last month
     const trend = score - lastScore;
 
     return {

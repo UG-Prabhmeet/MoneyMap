@@ -221,7 +221,7 @@ export function TransactionTable({ transactions }) {
             )}
 
             {/* --- Filter Bar --- */}
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-4 pt-5">
                 <div className="relative flex-1">
                     <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input

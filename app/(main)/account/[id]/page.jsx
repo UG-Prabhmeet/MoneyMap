@@ -29,13 +29,13 @@ export default async function AccountPage({ params }) {
                     <h1 className="text-5xl sm:text-6xl font-bold tracking-tight gradient-title capitalize">
                         {account.name}
                     </h1>
-                    <p className="text-muted-foreground">
+                    <p className="text-muted-foreground pb-3">
                         {/* Formatting the account type string to capitalize only the first letter */}
                         {account.type.charAt(0) + account.type.slice(1).toLowerCase()} Account
                     </p>
                 </div>
 
-                <div className="text-right pb-2">
+                <div className="text-right pb-3">
                     <div className="text-xl sm:text-2xl font-bold">
                         {/* Displaying balance formatted to two decimal places */}
                         ₹{parseFloat(account.balance).toFixed(2)}

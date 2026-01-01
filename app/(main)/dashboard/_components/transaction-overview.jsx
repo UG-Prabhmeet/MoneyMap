@@ -82,7 +82,7 @@ export function DashboardOverview({ accounts, transactions }) {
     return (
         <div className="grid gap-4 md:grid-cols-2">
             {/* Recent Transactions Card */}
-            <Card className="bg-white rounded-2xl border border-border shadow-sm">
+            <Card className="rounded-2xl border border-border shadow-sm">
                 <CardHeader className="flex flex-wrap gap-2 items-start justify-between space-y-0 pb-4">
                     <CardTitle className="text-base font-normal">
                         Recent Transactions

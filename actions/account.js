@@ -4,6 +4,7 @@ import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 
+// serializing decimal to number
 const serializeDecimal = (obj) => {
     const serialized = { ...obj };
     if (obj.balance) {
@@ -12,23 +13,30 @@ const serializeDecimal = (obj) => {
     if (obj.amount) {
         serialized.amount = obj.amount.toNumber();
     }
+    if (obj.savingsGoal) {
+        serialized.savingsGoal = obj.savingsGoal.toNumber();
+    }
     return serialized;
 };
 
+// get account with transactions
 export async function getAccountWithTransactions(accountId) {
-    const { userId } = await auth();
+    const { userId } = await auth(); // only fetches clerk userId
     if (!userId) throw new Error("Unauthorized");
 
+    // fetches user with all accounts, tx, budgets from db
     const user = await db.user.findUnique({
         where: { clerkUserId: userId },
     });
 
     if (!user) throw new Error("User not found");
 
+    // fetches the account with transactions
+    // if no accountId is provided, fetch the default account
     const account = await db.account.findFirst({
         where: {
-            id: accountId,
             userId: user.id,
+            ...(accountId ? { id: accountId } : { isDefault: true }),
         },
         include: {
             transactions: {
@@ -82,6 +90,8 @@ export async function bulkDeleteTransactions(transactionIds) {
         );
 
         // Delete transactions and update account balances in a transaction
+        // $transaction is used to run multiple db operations in a single transaction
+        // with atomicity
         await db.$transaction(async (tx) => {
             // Delete transactions
             await tx.transaction.deleteMany({
@@ -91,7 +101,7 @@ export async function bulkDeleteTransactions(transactionIds) {
                 },
             });
 
-            // Update account balances
+            // update account balances
             for (const [accountId, balanceChange] of Object.entries(
                 accountBalanceChanges
             )) {
@@ -106,7 +116,8 @@ export async function bulkDeleteTransactions(transactionIds) {
             }
         });
 
-        revalidatePath("/dashboard");
+        // revalidatePath = remove cache of page and fetch new data
+        revalidatePath("/dashboard"); 
         revalidatePath("/account/[id]");
 
         return { success: true };
@@ -115,6 +126,7 @@ export async function bulkDeleteTransactions(transactionIds) {
     }
 }
 
+// update default account
 export async function updateDefaultAccount(accountId) {
     try {
         const { userId } = await auth();
@@ -128,7 +140,7 @@ export async function updateDefaultAccount(accountId) {
             throw new Error("User not found");
         }
 
-        // First, unset any existing default account
+        // first, unsetting any existing default accounts
         await db.account.updateMany({
             where: {
                 userId: user.id,
@@ -137,7 +149,7 @@ export async function updateDefaultAccount(accountId) {
             data: { isDefault: false },
         });
 
-        // Then set the new default account
+        // then set the new default account
         const account = await db.account.update({
             where: {
                 id: accountId,
@@ -147,7 +159,43 @@ export async function updateDefaultAccount(accountId) {
         });
 
         revalidatePath("/dashboard");
-        return { success: true, data: serializeTransaction(account) };
+        return { success: true, data: serializeDecimal(account) };
+    } catch (error) {
+        return { success: false, error: error.message };
+    }
+}
+
+export async function updateSavingsGoal(accountId, savingsGoal) {
+    try {
+        const { userId } = await auth();
+        if (!userId) throw new Error("Unauthorized");
+
+        const user = await db.user.findUnique({
+            where: { clerkUserId: userId },
+        });
+
+        if (!user) {
+            throw new Error("User not found");
+        }
+
+        const goalAmount = parseFloat(savingsGoal);
+        if (isNaN(goalAmount) || goalAmount < 0) {
+            throw new Error("Invalid savings goal amount. Goal must be non-negative.");
+        }
+
+        const account = await db.account.update({
+            where: {
+                id: accountId,
+                userId: user.id,
+            },
+            data: {
+                savingsGoal: goalAmount,
+            },
+        });
+
+        revalidatePath("/dashboard");
+        revalidatePath("/analytics");
+        return { success: true, data: serializeDecimal(account) };
     } catch (error) {
         return { success: false, error: error.message };
     }

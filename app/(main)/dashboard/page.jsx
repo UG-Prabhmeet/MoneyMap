@@ -25,23 +25,49 @@ export default async function DashboardPage() {
         getUserAccounts(),
         getDashboardData(),
     ]);
+
     const defaultAccount = accounts?.find((account) => account.isDefault);
     let budgetData = null;
     let financialHealth = null;
 
     if (defaultAccount) {
         budgetData = await getCurrentBudget(defaultAccount.id);
-        financialHealth = await getFinancialHealth(defaultAccount.userId);
+        financialHealth = await getFinancialHealth(
+            defaultAccount.userId,
+            defaultAccount.id
+        );
     }
 
     return (
-        <div className="max-w-7xl mx-auto space-y-10 px-4 py-8 bg-slate-50/50 min-h-screen">
+        // <div className="max-w-7xl mx-auto space-y-10 px-4 py-8 bg-slate-50/50 min-h-screen">
+            <div className="px-4 md:px-6 lg:px-8 py-6 max-w-screen-2xl mx-auto">
+            {/* Header Section */}
+            {/* <div className="flex flex-col gap-2">
+                <h1 className="text-4xl md:text-5xl font-bold tracking-tight gradient-title">
+                    Dashboard
+                </h1>
+                <p className="text-slate-500 text-lg">
+                    Overview of your financial health and budget.
+                </p>
+            </div> */}
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-5xl sm:text-6xl font-bold tracking-tight gradient-title capitalize">
+                        Dashboard
+                    </h1>
+                    <p className="text-muted-foreground pb-6">
+                        Overview of your financial health and budget.
+                    </p>
+                </div>
+            </div>
             {/* Hero Stats: Budget & Health */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 pb-4">
                 <div className="lg:col-span-7">
                     <BudgetProgress
                         initialBudget={budgetData?.budget}
                         currentExpenses={budgetData?.currentExpenses || 0}
+                        period={budgetData?.period}
+                        accountId={defaultAccount?.id}
                     />
                 </div>
                 <div className="lg:col-span-5">
@@ -55,14 +81,14 @@ export default async function DashboardPage() {
             </div>
 
             {/* Main Overview: Transactions & Charts */}
-            <section className="space-y-4">
+            <section className="space-y-4 pb-4">
                 <div className="flex items-center gap-2 px-1">
                     <TrendingUp className="h-5 w-5 text-primary" />
                     <h2 className="text-xl font-bold text-slate-800">
                         Financial Overview
                     </h2>
                 </div>
-                <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+                <div className="overflow-hidden">
                     <DashboardOverview
                         accounts={accounts}
                         transactions={transactions || []}
@@ -102,7 +128,7 @@ export default async function DashboardPage() {
                         accounts.map((account) => (
                             <div
                                 key={account.id}
-                                className="hover:scale-[1.02] transition-transform"
+                                className="hover:scale-[1.02] transition-transform h-full"
                             >
                                 <AccountCard account={account} />
                             </div>
