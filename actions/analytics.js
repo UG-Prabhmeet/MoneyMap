@@ -4,8 +4,9 @@ import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { defaultCategories } from "@/data/categories";
 
-export async function getMonthlySpendingTrends() {
-    const { userId } = await auth();
+// monthly spending trends
+export async function getMonthlySpendingTrends(accountId) {
+    const { userId } = await auth(); // fetches clerk userId
     if (!userId) throw new Error("Unauthorized");
 
     const user = await db.user.findUnique({
@@ -14,24 +15,27 @@ export async function getMonthlySpendingTrends() {
 
     if (!user) throw new Error("User not found");
 
+    // all expense transactions
     const transactions = await db.transaction.findMany({
         where: {
             userId: user.id,
             type: "EXPENSE",
+            ...(accountId ? { accountId } : {}),
         },
         orderBy: {
             date: "asc",
         },
     });
 
-    // Filter only expense categories
+    // filter only expense categories
     const expenseCategories = defaultCategories.filter(
         (c) => c.type === "EXPENSE"
     );
 
-    // Build monthly grouped data
+    // build monthly grouped data
     const monthlyMap = {};
 
+    // for each month and transaction category, sum the amount
     for (const tx of transactions) {
         const date = new Date(tx.date);
         const month = date.toLocaleString("default", {
@@ -51,13 +55,14 @@ export async function getMonthlySpendingTrends() {
         }
     }
 
-    // Convert to array sorted by month
+    // convert to array sorted by month
     const monthlyData = Object.values(monthlyMap);
 
     return monthlyData;
 }
 
-export async function getSavingsSummary() {
+// savings summary
+export async function getSavingsSummary(accountId) {
     const { userId } = await auth();
     if (!userId) throw new Error("Unauthorized");
 
@@ -70,20 +75,24 @@ export async function getSavingsSummary() {
     const fromDate = new Date();
     fromDate.setMonth(fromDate.getMonth() - 3); // last 3 months
 
+    // last 3 months income
     const incomeTxs = await db.transaction.aggregate({
         where: {
             userId: user.id,
             type: "INCOME",
             date: { gte: fromDate },
+            ...(accountId ? { accountId } : {}),
         },
         _sum: { amount: true },
     });
-
+    
+    // last 3 months expense
     const expenseTxs = await db.transaction.aggregate({
         where: {
             userId: user.id,
             type: "EXPENSE",
             date: { gte: fromDate },
+            ...(accountId ? { accountId } : {}),
         },
         _sum: { amount: true },
     });
@@ -94,7 +103,8 @@ export async function getSavingsSummary() {
     };
 }
 
-export async function getNetWorthHistory() {
+// net worth history
+export async function getNetWorthHistory(accountId) {
     const { userId } = await auth();
     if (!userId) throw new Error("Unauthorized");
 
@@ -105,7 +115,10 @@ export async function getNetWorthHistory() {
     if (!user) throw new Error("User not found");
 
     const transactions = await db.transaction.findMany({
-        where: { userId: user.id },
+        where: {
+            userId: user.id,
+            ...(accountId ? { accountId } : {}),
+        },
         orderBy: { date: "asc" },
     });
 
@@ -130,7 +143,8 @@ export async function getNetWorthHistory() {
     return Object.values(monthlyNetWorth);
 }
 
-export async function getCashFlowData() {
+// cash flow data
+export async function getCashFlowData(accountId) {
     const { userId } = await auth();
     if (!userId) throw new Error("Unauthorized");
 
@@ -141,7 +155,10 @@ export async function getCashFlowData() {
     if (!user) throw new Error("User not found");
 
     const transactions = await db.transaction.findMany({
-        where: { userId: user.id },
+        where: {
+            userId: user.id,
+            ...(accountId ? { accountId } : {}),
+        },
         orderBy: { date: "asc" },
     });
 
@@ -178,7 +195,8 @@ export async function getCashFlowData() {
     return result;
 }
 
-export async function getBudgetInsights() {
+// budget insights
+export async function getBudgetInsights(accountId) {
     const { userId } = await auth();
     if (!userId) throw new Error("Unauthorized");
 
@@ -211,13 +229,14 @@ export async function getBudgetInsights() {
                 gte: startOfMonth,
                 lte: endOfMonth,
             },
+            ...(accountId ? { accountId } : {}),
         },
         _sum: {
             amount: true,
         },
     });
 
-    // Default budget per category
+    // default budget per category
     const defaultBudgetPerCategory = 5000;
 
     const insights = categories.map((cat) => {

@@ -83,8 +83,7 @@ const HeroSectionPage = () => {
                 </h2>
                 <p className="text-lg text-gray-400 text-center mb-12 max-w-2xl">
                     <AnimatedText
-                        text="Just a few clicks and you're ready to track every rupee you
-                    spend and save."
+                        text="Just a few clicks & you're ready to track every rupee you spend and save."
                     />
                 </p>
 
@@ -235,12 +234,22 @@ const HeroSectionPage = () => {
                         >
                             in
                         </Link>
+
+                        <Link 
+                            href="https://github.com/UG-Prabhmeet/MoneyMap"
+                            aria-label="GitHub"
+                            className="hover:text-gray-300 ml-4 transition-colors"
+                            target="_blank" // optional, opens in new tab
+                            rel="noopener noreferrer" // for security
+                        >
+                            github
+                        </Link>
                     </div>
                 </div>
 
                 {/* Bottom Bar */}
                 <div className="mt-12 border-t border-white/10 pt-6 text-sm text-gray-500 text-center">
-                    © {2025} MoneyMap. All rights reserved.
+                    © {new Date().getFullYear()} MoneyMap | Developed by Prabhmeet Singh | All rights reserved.
                 </div>
             </footer>
         </div>

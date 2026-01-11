@@ -45,11 +45,13 @@ const PREVIEW_DATA = {
     },
 };
 
+// Email template component
 export default function EmailTemplate({
     userName = "",
     type = "monthly-report",
     data = {},
 }) {
+    // Layout for the automated Monthly Financial Summary
     if (type === "monthly-report") {
         return (
             <Html>
@@ -136,6 +138,7 @@ export default function EmailTemplate({
         );
     }
 
+    // Layout for the Budget Threshold Alert (e.g., when user spending hits 80%)
     if (type === "budget-alert") {
         return (
             <Html>

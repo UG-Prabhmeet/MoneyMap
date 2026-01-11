@@ -19,14 +19,14 @@ export default async function TransactionPage() {
                     <h1 className="text-5xl sm:text-6xl font-bold tracking-tight gradient-title capitalize">
                         {account.name}
                     </h1>
-                    <p className="text-muted-foreground">
+                    <p className="text-muted-foreground pb-3">
                         {account.type.charAt(0) +
                             account.type.slice(1).toLowerCase()}{" "}
                         Account
                     </p>
                 </div>
 
-                <div className="text-right pb-2">
+                <div className="text-right pb-3">
                     <div className="text-xl sm:text-2xl font-bold">
                         ₹{parseFloat(account.balance).toFixed(2)}
                     </div>

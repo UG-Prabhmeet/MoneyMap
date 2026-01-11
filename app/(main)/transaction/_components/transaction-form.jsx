@@ -3,8 +3,7 @@
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CalendarIcon, Loader2 } from "lucide-react";
-import { format } from "date-fns";
+import { Loader2 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import useFetch from "@/hooks/use-fetch";
 import { toast } from "sonner";
@@ -19,12 +18,6 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
 import { CreateAccountDrawer } from "@/components/create-account-drawer";
 import { cn } from "@/lib/utils";
 import { createTransaction, updateTransaction } from "@/actions/transaction";
@@ -94,6 +87,7 @@ export function AddTransactionForm({
         }
     };
 
+    // update form fields with data extracted by AI
     const handleScanComplete = (scannedData) => {
         if (scannedData) {
             setValue("amount", scannedData.amount.toString());
@@ -236,36 +230,14 @@ export function AddTransactionForm({
             {/* Date */}
             <div className="space-y-2">
                 <label className="text-sm font-medium">Date</label>
-                <Popover>
-                    <PopoverTrigger asChild>
-                        <Button
-                            variant="outline"
-                            className={cn(
-                                "w-full pl-3 text-left font-normal",
-                                !date && "text-muted-foreground"
-                            )}
-                        >
-                            {date ? (
-                                format(date, "PPP")
-                            ) : (
-                                <span>Pick a date</span>
-                            )}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                            mode="single"
-                            selected={date}
-                            onSelect={(date) => setValue("date", date)}
-                            disabled={(date) =>
-                                date > new Date() ||
-                                date < new Date("1900-01-01")
-                            }
-                            initialFocus
-                        />
-                    </PopoverContent>
-                </Popover>
+                <Input
+                    type="date"
+                    {...register("date", {
+                        valueAsDate: true,
+                    })}
+                    className="w-full"
+                    max={new Date().toISOString().split("T")[0]}
+                />
                 {errors.date && (
                     <p className="text-sm text-red-500">
                         {errors.date.message}

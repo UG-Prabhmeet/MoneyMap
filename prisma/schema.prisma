@@ -10,13 +10,13 @@ datasource db {
 
 model User {
   id            String    @id @default(uuid())
-  clerkUserId   String    @unique // clerk user id
+  clerkUserId   String    @unique // link to Clerk auth user
   email         String    @unique
   name          String?
   imageUrl      String?
-  transactions  Transaction[]
-  accounts      Account[]
-  budgets       Budget[]
+  transactions  Transaction[] // all transactions across all accounts
+  accounts      Account[]     // multiple accounts
+  budgets      Budget[]       // 1 budget for each account
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 
@@ -26,8 +26,10 @@ model User {
 model Account {
   id           String        @id @default(uuid())
   name         String
-  type         AccountType
-  balance      Decimal       @default(0) // will ask inital balance while creating an account
+  type         AccountType   // INCOME or EXPENSE
+  balance      Decimal       @default(0) 
+  savingsGoal  Decimal       @default(0)
+  budget       Budget?
   isDefault    Boolean       @default(false)
   userId       String
   user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -48,9 +50,9 @@ model Transaction {
   category         String           
   receiptUrl       String?
   isRecurring      Boolean           @default(false)
-  recurringInterval RecurringInterval? // Only used if isRecurring is true
-  nextRecurringDate DateTime?         // Next date for recurring transaction
-  lastProcessed    DateTime?         // Last time this recurring transaction was processed
+  recurringInterval RecurringInterval? 
+  nextRecurringDate DateTime?        
+  lastProcessed    DateTime?       
   status           TransactionStatus  @default(COMPLETED)
   userId           String
   user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -64,12 +66,15 @@ model Transaction {
   @@map("transactions")
 }
 
-
 model Budget {
   id          String       @id @default(uuid())
   amount      Decimal
-  lastAlertSent DateTime?  // Track when the last alert was sent
-  userId      String       @unique
+  lastAlertSent DateTime?  
+
+  accountId     String    @unique // One budget per account
+  account       Account   @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  userId      String       
   user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt

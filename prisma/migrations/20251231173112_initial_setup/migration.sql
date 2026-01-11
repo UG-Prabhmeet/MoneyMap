@@ -64,6 +64,7 @@ CREATE TABLE "budgets" (
     "id" TEXT NOT NULL,
     "amount" DECIMAL(65,30) NOT NULL,
     "lastAlertSent" TIMESTAMP(3),
+    "accountId" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -87,7 +88,7 @@ CREATE INDEX "transactions_userId_idx" ON "transactions"("userId");
 CREATE INDEX "transactions_accountId_idx" ON "transactions"("accountId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "budgets_userId_key" ON "budgets"("userId");
+CREATE UNIQUE INDEX "budgets_accountId_key" ON "budgets"("accountId");
 
 -- CreateIndex
 CREATE INDEX "budgets_userId_idx" ON "budgets"("userId");
@@ -100,6 +101,9 @@ ALTER TABLE "transactions" ADD CONSTRAINT "transactions_userId_fkey" FOREIGN KEY
 
 -- AddForeignKey
 ALTER TABLE "transactions" ADD CONSTRAINT "transactions_accountId_fkey" FOREIGN KEY ("accountId") REFERENCES "accounts"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "budgets" ADD CONSTRAINT "budgets_accountId_fkey" FOREIGN KEY ("accountId") REFERENCES "accounts"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "budgets" ADD CONSTRAINT "budgets_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
