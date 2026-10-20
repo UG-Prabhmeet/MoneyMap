@@ -74,20 +74,19 @@ export default function EmailTemplate({
                             <div style={styles.stat}>
                                 <Text style={styles.text}>Total Income</Text>
                                 <Text style={styles.heading}>
-                                    ${data?.stats.totalIncome}
+                                    ₹ {data?.stats.totalIncome}
                                 </Text>
                             </div>
                             <div style={styles.stat}>
                                 <Text style={styles.text}>Total Expenses</Text>
                                 <Text style={styles.heading}>
-                                    ${data?.stats.totalExpenses}
+                                    ₹ {data?.stats.totalExpenses}
                                 </Text>
                             </div>
                             <div style={styles.stat}>
                                 <Text style={styles.text}>Net</Text>
                                 <Text style={styles.heading}>
-                                    $
-                                    {data?.stats.totalIncome -
+                                    ₹ {data?.stats.totalIncome -
                                         data?.stats.totalExpenses}
                                 </Text>
                             </div>
@@ -106,7 +105,7 @@ export default function EmailTemplate({
                                                 {category}
                                             </Text>
                                             <Text style={styles.text}>
-                                                ${amount}
+                                                ₹ {amount}
                                             </Text>
                                         </div>
                                     )
@@ -156,19 +155,19 @@ export default function EmailTemplate({
                             <div style={styles.stat}>
                                 <Text style={styles.text}>Budget Amount</Text>
                                 <Text style={styles.heading}>
-                                    ${data?.budgetAmount}
+                                    ₹ {data?.budgetAmount}
                                 </Text>
                             </div>
                             <div style={styles.stat}>
                                 <Text style={styles.text}>Spent So Far</Text>
                                 <Text style={styles.heading}>
-                                    ${data?.totalExpenses}
+                                    ₹ {data?.totalExpenses}
                                 </Text>
                             </div>
                             <div style={styles.stat}>
                                 <Text style={styles.text}>Remaining</Text>
                                 <Text style={styles.heading}>
-                                    ${data?.budgetAmount - data?.totalExpenses}
+                                    ₹ {data?.budgetAmount - data?.totalExpenses}
                                 </Text>
                             </div>
                         </Section>

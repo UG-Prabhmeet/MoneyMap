@@ -52,7 +52,7 @@ export function exportToPDF(transactions) {
         new Date(t.date).toLocaleDateString(),
         t.description,
         t.category,
-        `$${t.amount.toFixed(2)}`,
+        `${t.amount.toFixed(2)}`,
         t.type,
         t.isRecurring ? t.recurringInterval : "One-time",
     ]);
