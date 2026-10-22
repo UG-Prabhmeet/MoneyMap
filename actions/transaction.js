@@ -46,10 +46,27 @@ export async function createTransaction(data) {
         const req = await request();
 
         // check if the user has exceeded their rate limit (rate limits are configured in lib/arcjet.js)
+        const arcjetStart = performance.now();
         const decision = await aj.protect(req, {
             userId,
             requested: 1, // consume 1 token from the bucket
         });
+        const arcjetDuration = Math.round(performance.now() - arcjetStart);
+
+        // Extract rate-limit details
+        const rateLimitResult = decision.results?.find(r => r.reason?.isRateLimit?.());
+        const remaining = rateLimitResult?.reason?.remaining ?? (decision.reason?.isRateLimit?.() ? decision.reason.remaining : "N/A");
+        const reset = rateLimitResult?.reason?.reset ?? (decision.reason?.isRateLimit?.() ? decision.reason.reset : "N/A");
+
+        console.log("\n================ [ARCJET SECURITY METRICS] ================");
+        console.log(`🛡️ Status: ${decision.isDenied() ? "DENIED ❌" : "ALLOWED ✅"}`);
+        console.log(`⏱️ Multi-Rule Security Latency: ${arcjetDuration} ms`);
+        console.log(`🪙 Tokens Remaining: ${remaining}`);
+        console.log(`⏳ Bucket Window Reset: ${reset}s`);
+        if (decision.results) {
+            console.log(`🔒 Active Rules Evaluated: [WAF_SHIELD, BOT_DETECTION, TOKEN_BUCKET]`);
+        }
+        console.log("===========================================================\n");
 
         // handle denied requests (e.g., rate limit exceeded)
         if (decision.isDenied()) {
@@ -263,6 +280,9 @@ export async function getUserTransactions(query = {}) {
 
 // process the receipt image using Google Gemini AI.
 export async function scanReceipt(file) {
+
+    const totalStartTime = performance.now(); // ⏱️ Start total timer
+
     const MAX_RETRIES = 3; 
     let lastError = null;
 
@@ -307,6 +327,10 @@ export async function scanReceipt(file) {
                 await new Promise((resolve) => setTimeout(resolve, delay));
             }
 
+            // ⏱️ Start Gemini-specific timer
+            const geminiStartTime = performance.now();
+
+
             // send image and prompt to Gemini
             const result = await model.generateContent([
                 {
@@ -320,6 +344,19 @@ export async function scanReceipt(file) {
 
             const response = await result.response;
             const text = await response.text();
+
+            // ⏱️ Calculate timings
+            const geminiDuration = Math.round(performance.now() - geminiStartTime);
+            const totalDuration = Math.round(performance.now() - totalStartTime);
+            // 📊 Log the metrics
+            console.log("\n================ [RECEIPT SCAN METRICS] ================");
+            console.log(`📸 File Size: ${(file.size / 1024).toFixed(1)} KB`);
+            console.log(`🤖 Gemini API Latency: ${geminiDuration} ms (${(geminiDuration / 1000).toFixed(2)}s)`);
+            console.log(`⏱️ Total Processing Time: ${totalDuration} ms (${(totalDuration / 1000).toFixed(2)}s)`);
+            console.log(`🔄 Attempt: ${attempt + 1}/${MAX_RETRIES}`);
+            console.log("========================================================\n");
+
+            
 
             // clean the response text (remove markdown markers if AI included them)
             const cleanedText = text.replace(/```(?:json)?\n?/g, "").trim();

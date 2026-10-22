@@ -6,11 +6,13 @@ import { DEBT_CATEGORY_IDS } from "@/data/categories";
 export async function getFinancialHealth(userId, accountId) {
     const now = new Date();
     const start = startOfMonth(now);
-
-    // this month's stats
-    const [incomeTx, expenseTx, debtTx] = await Promise.all([
-
-        // all income transactions
+    const lastMonthStart = startOfMonth(subMonths(now, 1));
+    // 🚀 FIRE ALL 6 QUERIES SIMULTANEOUSLY IN PARALLEL:
+    const [
+        incomeTx, expenseTx, debtTx,
+        lastIncomeTx, lastExpenseTx, lastDebtTx
+    ] = await Promise.all([
+        // --- THIS MONTH ---
         db.transaction.aggregate({
             _sum: { amount: true },
             where: {
@@ -20,8 +22,6 @@ export async function getFinancialHealth(userId, accountId) {
                 ...(accountId ? { accountId } : {}),
             },
         }),
-        
-        // all expense transactions
         db.transaction.aggregate({
             _sum: { amount: true },
             where: {
@@ -31,8 +31,6 @@ export async function getFinancialHealth(userId, accountId) {
                 ...(accountId ? { accountId } : {}),
             },
         }),
-
-        // all debt transactions
         db.transaction.aggregate({
             _sum: { amount: true },
             where: {
@@ -43,67 +41,51 @@ export async function getFinancialHealth(userId, accountId) {
                 ...(accountId ? { accountId } : {}),
             },
         }),
+        // --- LAST MONTH ---
+        db.transaction.aggregate({
+            _sum: { amount: true },
+            where: {
+                userId,
+                type: "INCOME",
+                date: { gte: lastMonthStart, lt: start },
+                ...(accountId ? { accountId } : {}),
+            },
+        }),
+        db.transaction.aggregate({
+            _sum: { amount: true },
+            where: {
+                userId,
+                type: "EXPENSE",
+                date: { gte: lastMonthStart, lt: start },
+                ...(accountId ? { accountId } : {}),
+            },
+        }),
+        db.transaction.aggregate({
+            _sum: { amount: true },
+            where: {
+                userId,
+                type: "EXPENSE",
+                category: { in: DEBT_CATEGORY_IDS },
+                date: { gte: lastMonthStart, lt: start },
+                ...(accountId ? { accountId } : {}),
+            },
+        }),
     ]);
-
+    
     const income = Number(incomeTx._sum.amount || 0);
     const expenses = Number(expenseTx._sum.amount || 0);
     const debt = Number(debtTx._sum.amount || 0);
-
     const savingsRate = income > 0 ? (income - expenses) / income : 0;
     const debtToIncome = income > 0 ? debt / income : 0;
-
     const score = calculateHealthScore(savingsRate, debtToIncome);
-
-    // last month's score for trend comparison
-    const lastMonthStart = startOfMonth(subMonths(new Date(), 1));
-
-    const [lastIncomeTx, lastExpenseTx, lastDebtTx] = await Promise.all([
-        // last month all income transactions
-        db.transaction.aggregate({
-            _sum: { amount: true },
-            where: {
-                userId,
-                type: "INCOME",
-                date: { gte: lastMonthStart, lt: start },
-                ...(accountId ? { accountId } : {}),
-            },
-        }),
-        // last month all expense transactions
-        db.transaction.aggregate({
-            _sum: { amount: true },
-            where: {
-                userId,
-                type: "EXPENSE",
-                date: { gte: lastMonthStart, lt: start },
-                ...(accountId ? { accountId } : {}),
-            },
-        }),
-        // last month all debt transactions
-        db.transaction.aggregate({
-            _sum: { amount: true },
-            where: {
-                userId,
-                type: "EXPENSE",
-                category: { in: DEBT_CATEGORY_IDS },
-                date: { gte: lastMonthStart, lt: start },
-                ...(accountId ? { accountId } : {}),
-            },
-        }),
-    ]);
-
     const lastIncome = Number(lastIncomeTx._sum.amount || 0);
     const lastExpenses = Number(lastExpenseTx._sum.amount || 0);
     const lastDebt = Number(lastDebtTx._sum.amount || 0);
-
     const lastSavingsRate =
         lastIncome > 0 ? (lastIncome - lastExpenses) / lastIncome : 0;
     const lastDebtToIncome = lastIncome > 0 ? lastDebt / lastIncome : 0;
-
     const lastScore = calculateHealthScore(lastSavingsRate, lastDebtToIncome);
-
-    // trend = difference between this month and last month
     const trend = score - lastScore;
-
     return {
         income,
         expenses,

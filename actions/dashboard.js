@@ -205,10 +205,19 @@ export async function getDashboardData() {
 
     if (!user) throw new Error("User not found");
 
-    // get all user transactions
+    // Bounded Query: Only fetch what the dashboard overview actually needs
+    const startOfMonth = new Date();
+    startOfMonth.setDate(1);
+    startOfMonth.setHours(0, 0, 0, 0);
     const transactions = await db.transaction.findMany({
-        where: { userId: user.id },
+        where: {
+            userId: user.id,
+            OR: [
+                { date: { gte: startOfMonth } },
+            ],
+        },
         orderBy: { date: "desc" },
+        take: 50, // 👈 Cap query payload to max 50 rows instead of unbounded 500+
     });
 
     return transactions.map(serializeTransaction);

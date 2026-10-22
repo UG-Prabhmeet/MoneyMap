@@ -17,6 +17,9 @@ import { getFinancialHealth } from "@/actions/financial-health";
 import { checkUser } from "@/lib/checkUser";
 
 export default async function DashboardPage() {
+
+    const dashboardStart = performance.now(); // ⏱️ Start timer
+
     // FORCE the user sync to finish first
     const user = await checkUser();
 
@@ -30,13 +33,22 @@ export default async function DashboardPage() {
     let budgetData = null;
     let financialHealth = null;
 
+     // ✅ PARALLEL FETCH (Runs concurrently):
     if (defaultAccount) {
-        budgetData = await getCurrentBudget(defaultAccount.id);
-        financialHealth = await getFinancialHealth(
-            defaultAccount.userId,
-            defaultAccount.id
-        );
+        [budgetData, financialHealth] = await Promise.all([
+            getCurrentBudget(defaultAccount.id),
+            getFinancialHealth(defaultAccount.userId, defaultAccount.id),
+        ]);
     }
+
+    
+    // ⏱️ Log the baseline
+    const totalDuration = Math.round(performance.now() - dashboardStart);
+    console.log("\n================ [DASHBOARD FETCH METRICS] ================");
+    console.log(`⚡ Total Server Data Fetch Time: ${totalDuration} ms (${(totalDuration / 1000).toFixed(2)}s)`);
+    console.log(`📊 Total Accounts: ${accounts?.length || 0}`);
+    console.log(`💳 Total Transactions: ${transactions?.length || 0}`);
+    console.log("===========================================================\n");
 
     return (
         // <div className="max-w-7xl mx-auto space-y-10 px-4 py-8 bg-slate-50/50 min-h-screen">
